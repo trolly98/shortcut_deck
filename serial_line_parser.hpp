@@ -6,7 +6,8 @@ enum class CommandType
   SWITCH_CFG,
   ADD_CFG,
   RM_CFG,
-  SHOW_CFG
+  SHOW_CFG,
+  SHOW_ACTUAL_CFG
 };
 
 struct CommandResult 
@@ -21,22 +22,47 @@ CommandType recognize_command(const String &cmdStr)
   if (cmdStr == "ADD_CFG")    return CommandType::ADD_CFG;
   if (cmdStr == "RM_CFG")     return CommandType::RM_CFG;
   if (cmdStr == "SHOW_CFG")   return CommandType::SHOW_CFG;
+  if (cmdStr == "SHOW_ACTUAL_CFG")   return CommandType::SHOW_ACTUAL_CFG;
   return CommandType::UNKNOWN;
 }
-
 
 CommandResult parse_serial_line(const String &line) 
 {
   String cmdStr = line;
   String payload;
-
   int eqIndex = line.indexOf('=');
-  if (eqIndex == -1)
+  if (eqIndex != -1)
   {
     cmdStr = line.substring(0, eqIndex);
     payload = line.substring(eqIndex + 1); 
   }  
-  Serial.println("Command recognizion...");
+  Serial.println("Command recognizion: " + cmdStr);
   CommandType cmd = recognize_command(cmdStr);
   return {recognize_command(cmdStr), payload};
+}
+
+void parse_json(String json_data, String functions[8]) 
+{
+    for (int i = 0; i < 8; i++) 
+    {
+        String key = "\"btn_" + String(i + 1) + "\":\"";
+        int start = json_data.indexOf(key);
+        if (start != -1) 
+        {
+            start += key.length();
+            int end = json_data.indexOf("\"", start);
+            if (end != -1) 
+            {
+                functions[i] = json_data.substring(start, end);
+            } 
+            else 
+            {
+                functions[i] = "";
+            }
+        } 
+        else 
+        {
+            functions[i] = "";
+        }
+    }
 }

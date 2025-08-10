@@ -9,3 +9,6 @@ echo "RM_CFG=2" > /dev/ttyACM0
 
 Vedere intera configurazione
 echo "SHOW_CFG" > /dev/ttyACM0
+
+Vedere configurazione selezionata
+echo "SHOW_ACTUAL_CFG" > /dev/ttyACM0

@@ -9,26 +9,35 @@ bool exec_cmd(const CommandResult &cmd_result)
   {
     case CommandType::SWITCH_CFG:
     {
-      Serial.print(F("Switch configuration to ID: "));
-      Serial.println(cmd_result.payload);
-      const ButtonsConfiguration::configuration_id_t id 
-      = static_cast<ButtonsConfiguration::configuration_id_t>(cmd_result.payload.toInt());
-      global_buttons_configuration.select_configuration(id);
+      const ButtonsConfiguration::index_t index 
+        = static_cast<ButtonsConfiguration::index_t>(cmd_result.payload.toInt());
+      global_buttons_configuration.select_configuration(index);
       return true;
     }
 
     case CommandType::ADD_CFG:
-      Serial.print(F("Add configurazione: "));
-      Serial.println(cmd_result.payload);
+    {
+      String functions[8];
+      parse_json(cmd_result.payload, functions);
+      global_buttons_configuration.add_configuration(functions);
       return true;
+    }
 
     case CommandType::RM_CFG:
-      Serial.print(F("Remove configuration ID: "));
-      Serial.println(cmd_result.payload);
+    {
+      const ButtonsConfiguration::index_t index 
+        = static_cast<ButtonsConfiguration::index_t>(cmd_result.payload.toInt());
+      global_buttons_configuration.remove_configuration(index);
       return true;
+    }
     case CommandType::SHOW_CFG:
     {
       global_buttons_configuration.print_configuration();
+      return true;
+    }
+    case CommandType::SHOW_ACTUAL_CFG:
+    {
+      Serial.println("Current cfg index: " + String(global_buttons_configuration.current_index()));
       return true;
     }
     default:
