@@ -1,0 +1,11 @@
+Cambiare configurazione:
+echo "SWITCH_CFG=2" > /dev/ttyACM0
+
+Aggiungere configurazione:
+echo "ADD_CFG={"btn_1":"c", "btn_2":"h"} > /dev/ttyACM0
+
+Eliminare configurazione
+echo "RM_CFG=2" > /dev/ttyACM0
+
+Vedere intera configurazione
+echo "SHOW_CFG" > /dev/ttyACM0
