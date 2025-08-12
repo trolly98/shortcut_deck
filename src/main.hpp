@@ -12,7 +12,7 @@ void main_setup()
 
 void main_loop() 
 {
-    check_serial_config();
+  check_serial_config();
 
   if (!global_buttons_configuration.configuration_available())
   {

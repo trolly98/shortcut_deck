@@ -15,18 +15,18 @@ FunctionButton::FunctionButton(Number number,
 {
     if (!this->is_valid() || key == "" || number == Number::UNKNOWN)
     {
-        //Serial.println("Button with pin: " + String(this->pin()) + " - and key: " + key + " is invalid");
+        ////Serial.println("Button with pin: " + String(this->pin()) + " - and key: " + key + " is invalid");
         return;
     }
     else
     {
-        Serial.println("Button with pin: " + String(this->pin()) + " - and key: " + key + " created");
+        //Serial.println("Button with pin: " + String(this->pin()) + " - and key: " + key + " created");
     }
     printFreeMemory();
     _special_key_count = _key_parser.parse_keys(_key, _special_key, MAX_SPECIAL_KEYS);
     printFreeMemory();
-    Serial.println("Special keys parsed for button: " + this->key());
-    Serial.println("Number of special keys: " + String(_special_key_count));
+    //Serial.println("Special keys parsed for button: " + this->key());
+    //Serial.println("Number of special keys: " + String(_special_key_count));
     printFreeMemory();
 }
 
@@ -37,7 +37,7 @@ FunctionButton::FunctionButton() :
 
 FunctionButton::~FunctionButton() 
 {
-    Serial.println("FunctionButton destructor called for button: " + this->key());
+    //Serial.println("FunctionButton destructor called for button: " + this->key());
     for (int i = 0; i < _special_key_count; i++)
     {
         if (_special_key[i] != nullptr)
@@ -114,15 +114,15 @@ void FunctionButton::released()
 void FunctionButton::_action(KeyboardStringAction write_function,
                              KeyboardIntAction special_function)
 {
-    Serial.println("FunctionButton::_action key_count: " + String(_special_key_count));
+    //Serial.println("FunctionButton::_action key_count: " + String(_special_key_count));
     for (int i = 0; i < _special_key_count; i++)
     {
         if (_special_key[i] != nullptr)
         {
-            Serial.println("Special key found: " + _special_key[i]->toString());
+            //Serial.println("Special key found: " + _special_key[i]->toString());
             if (*_special_key[i] == SpecialKey::KeyType::TEXT)
             {
-                Serial.println("Print " + (_special_key[i]->value()));
+                //Serial.println("Print " + (_special_key[i]->value()));
                 if (write_function)
                 {
                     (*write_function)(_special_key[i]->value());
@@ -135,7 +135,7 @@ void FunctionButton::_action(KeyboardStringAction write_function,
                     if (special_function)
                     {
                         uint8_t key_code = static_cast<uint8_t>(_keyboard_converter->operator()(*_special_key[i]));
-                        Serial.println("Special " + String(key_code));
+                        //Serial.println("Special " + String(key_code));
                         (*special_function)(key_code);
                     }
                 }

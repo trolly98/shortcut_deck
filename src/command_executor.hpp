@@ -40,12 +40,12 @@ bool exec_cmd(const CommandResult &cmd_result)
     
     case CommandType::SHOW_ACTUAL_CFG:
     {
-      Serial.println("Current cfg index: " + String(global_buttons_configuration.current_index()));
+      //Serial.println("Current cfg index: " + String(global_buttons_configuration.current_index()));
       return true;
     }
     
     default:
-      Serial.println(F("Unknown command!"));
+      //Serial.println(F("Unknown command!"));
       return false;
   }
 }

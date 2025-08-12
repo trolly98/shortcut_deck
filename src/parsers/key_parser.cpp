@@ -8,7 +8,7 @@ int KeyParser::parse_keys(const String &key_combination,
                          SpecialKey* special_keys[], 
                          int max_keys)
 {
-    Serial.println("Parsing keys: " + key_combination);
+    //Serial.println("Parsing keys: " + key_combination);
     int count = 0;
     String current = "";
 
@@ -34,7 +34,7 @@ int KeyParser::parse_keys(const String &key_combination,
         special_keys[count++] = this->parse_key(current);
     }
 
-    Serial.println("Parsed keys count: " + String(count));
+    //Serial.println("Parsed keys count: " + String(count));
     return count;
 }
 

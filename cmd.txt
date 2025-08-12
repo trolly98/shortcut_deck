@@ -2,7 +2,7 @@ Cambiare configurazione:
 echo "SWITCH_CFG=2" > /dev/ttyACM0
 
 Aggiungere configurazione:
-echo "ADD_CFG={"btn_1":"c", "btn_2":"h"} > /dev/ttyACM0
+echo "ADD_CFG={"btn_1":"ctrl", "btn_2":"ctrl+v"} > /dev/ttyACM0
 
 Eliminare configurazione
 echo "RM_CFG=2" > /dev/ttyACM0
@@ -12,3 +12,9 @@ echo "SHOW_CFG" > /dev/ttyACM0
 
 Vedere configurazione selezionata
 echo "SHOW_ACTUAL_CFG" > /dev/ttyACM0
+
+
+  ButtonArray* _config[MAX_BTN_NUMBER];
+  uint8_t _config_size;
+  index_t _cfg_selected;
+  ButtonArray* _buttons_selected;

@@ -8,7 +8,9 @@ using function_t = String;
 class ButtonArray {
 public:
   FunctionButton* buttons[MAX_BTN_NUMBER];
-  ~ButtonArray() { Serial.println(F("ButtonArray destroyed")); };
+  ~ButtonArray() {
+    //Serial.println(F("ButtonArray destroyed")); 
+  };
 };
 
 class ButtonsConfiguration

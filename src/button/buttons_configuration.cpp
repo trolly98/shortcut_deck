@@ -10,7 +10,6 @@ ButtonsConfiguration::ButtonsConfiguration() :
 
 bool ButtonsConfiguration::init()
 {
-  Serial.println(F("Initializing button configurations..."));
   this->_load_data();
 }
 
@@ -62,7 +61,7 @@ ButtonArray* ButtonsConfiguration::get_configuration_btn(index_t index)
 {
   if (index >= _config_size || _config[index] == nullptr)
   {
-    Serial.println("Configuration index: " + String(index) + " not present!");
+    //Serial.println("Configuration index: " + String(index) + " not present!");
     return nullptr;
   }
   return _config[index];
@@ -70,33 +69,31 @@ ButtonArray* ButtonsConfiguration::get_configuration_btn(index_t index)
 
 void ButtonsConfiguration::print_configuration()
 {
-  Serial.print(F("CONFIGURATION: "));
-  Serial.print(F(" SIZE: "));
+  Serial.print(F("CONFIGURATION SIZE: "));
   Serial.println(_config_size);
-  Serial.print(F(" BUTTONS: "));
+
   for (index_t index = 0; index < _config_size; ++index)
   {
     ButtonArray* btnArr = _config[index];
-    if (btnArr == nullptr)
-    {
-      continue;
-    }
+    if (!btnArr) continue;
 
     Serial.print(F("Config INDEX "));
-    Serial.print(index);
-    Serial.println(F(":"));
-    Serial.print(F("  Buttons: "));
+    Serial.println(index);
+
     for (int b = 0; b < MAX_BTN_NUMBER; b++)
     {
       Serial.print(F("["));
       Serial.print(b);
       Serial.print(F("] "));
-      Serial.print( FunctionButton::get_number_string(btnArr->buttons[b]->number()));
+      Serial.print(FunctionButton::get_number_string(
+                     btnArr->buttons[b]->number()
+                   ));
       Serial.print(F("("));
       Serial.print(btnArr->buttons[b]->key());
       Serial.print(F(")"));
 
-      if (b < 7) Serial.print(F(", "));
+      if (b < MAX_BTN_NUMBER - 1)
+        Serial.print(F(", "));
     }
     Serial.println();
     Serial.println(F("---------------------------"));
@@ -179,8 +176,8 @@ void ButtonsConfiguration::_load_data()
     matrixData += ch;
   }
 
-  // Serial.println("Read Matrixdata: " + String(matrixData));
-  // Serial.println("Selected: " + String(selected));
+  // //Serial.println("Read Matrixdata: " + String(matrixData));
+  // //Serial.println("Selected: " + String(selected));
 
   String function[MAX_BTN_NUMBER];   // array per le celle della riga
   int cellIndex = 0;    // indice cella corrente
@@ -202,18 +199,20 @@ void ButtonsConfiguration::_load_data()
           if (ch == '\n') 
           {
               // Fine riga → stampa function
-              Serial.print("Riga: ");
-              for (int i = 0; i < cellIndex; i++) {
-                  Serial.print("[");
-                  Serial.print(function[i]);
-                  Serial.print("]");
-                  if (i < cellIndex - 1) Serial.print(", ");
-              }
-              Serial.println();
+              //Serial.print("Riga: ");
+              // for (int i = 0; i < cellIndex; i++) {
+              //     //Serial.print("[");
+              //     //Serial.print(function[i]);
+              //     //Serial.print("]");
+              //     if (i < cellIndex - 1) {
+              //       //Serial.print(", ");
+              //     }
+              // }
+              //Serial.println();
 
               if(!this->_add_configuration(function))
               {
-                Serial.println("Add configuration FAILED!");
+                //Serial.println("Add configuration FAILED!");
               }
 
               // Reset per la nuova riga
@@ -226,7 +225,7 @@ void ButtonsConfiguration::_load_data()
       }
   }
 
-  Serial.println("Selected: " + String(selected));
+  //Serial.println("Selected: " + String(selected));
   this->_select_configuration(selected);
 }
 
@@ -234,7 +233,8 @@ bool ButtonsConfiguration::_add_configuration(const function_t function_list[MAX
 {
   if (_config_size >= MAX_CONFIGURATION_NUMBER)
   {
-    Serial.println("Maximum configurations reached: " + String(MAX_CONFIGURATION_NUMBER));
+    Serial.print(F("Maximum configurations reached: "));
+    Serial.println(MAX_CONFIGURATION_NUMBER);
     return false;
   }
 
@@ -248,7 +248,7 @@ bool ButtonsConfiguration::_add_configuration(const function_t function_list[MAX
     printFreeMemory();
   }
   _config[_config_size++] = arr;
-  Serial.println("Add configuration done, config size: " + String(_config_size));
+  //Serial.println("Add configuration done, config size: " + String(_config_size));
   printFreeMemory();
   return true;
 }
@@ -257,7 +257,7 @@ bool ButtonsConfiguration::_select_configuration(index_t index)
 {
   if (_cfg_selected == index)
   {
-    Serial.println("Selected same configuration with index: " + String(index));
+    //Serial.println("Selected same configuration with index: " + String(index));
     return true;
   }
 
@@ -268,7 +268,7 @@ bool ButtonsConfiguration::_select_configuration(index_t index)
   }
   _cfg_selected = index;
   _buttons_selected = btn_selected;
-  Serial.println("Configuration index: " + String(index) + " selected!");
+  //Serial.println("Configuration index: " + String(index) + " selected!");
   return true;
 }
 
@@ -276,7 +276,7 @@ bool ButtonsConfiguration::_remove_configuration(index_t index)
 {
   if (_config_size < 1)
   {
-    Serial.println("No configuration saved!");
+    //Serial.println("No configuration saved!");
     return false;
   }
   if (index < _config_size && _config[index] != nullptr) 
@@ -299,7 +299,7 @@ bool ButtonsConfiguration::_remove_configuration(index_t index)
     }
     _config[_config_size - 1] = nullptr;
     _config_size--;
-    Serial.println("Remove configuration INDEX: " + String(index) + " done!");
+    //Serial.println("Remove configuration INDEX: " + String(index) + " done!");
 
     if (_cfg_selected >= index)
     {
@@ -308,6 +308,6 @@ bool ButtonsConfiguration::_remove_configuration(index_t index)
     return true;
   }
 
-  Serial.println("Remove configuration INDEX: " + String(index) + " not found!");
+  //Serial.println("Remove configuration INDEX: " + String(index) + " not found!");
   return false;
 }

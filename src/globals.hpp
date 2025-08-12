@@ -6,7 +6,7 @@
 
 // void print(const String& str) 
 // {
-//   Serial.println(str.c_str());
+//   //Serial.println(str.c_str());
 // }
 
 ButtonsConfiguration global_buttons_configuration;

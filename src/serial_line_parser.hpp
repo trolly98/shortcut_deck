@@ -38,7 +38,7 @@ CommandResult parse_serial_line(const String &line)
     cmdStr = line.substring(0, eqIndex);
     payload = line.substring(eqIndex + 1); 
   }  
-  Serial.println("Command recognizion: " + cmdStr);
+  //Serial.println("Command recognizion: " + cmdStr);
   CommandType cmd = recognize_command(cmdStr);
   return {recognize_command(cmdStr), payload};
 }
