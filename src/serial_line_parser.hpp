@@ -1,5 +1,7 @@
 #pragma once
 
+#include "globals.hpp"
+
 enum class CommandType 
 {
   UNKNOWN,
@@ -41,9 +43,37 @@ CommandResult parse_serial_line(const String &line)
   return {recognize_command(cmdStr), payload};
 }
 
-void parse_json(String json_data, String functions[8]) 
+// void parse_json(const String &json_data, char functions[MAX_BTN_NUMBER][MAX_CONFIGURATION_NUMBER]) 
+// {
+//     for (int i = 0; i < MAX_BTN_NUMBER; i++) 
+//     {
+//         String key = "\"btn_" + String(i + 1) + "\":\"";
+//         int start = json_data.indexOf(key);
+//         if (start != -1) 
+//         {
+//             start += key.length();
+//             int end = json_data.indexOf("\"", start);
+//             if (end != -1) 
+//             {
+//                 int len = end - start;
+//                 if (len >= MAX_CONFIGURATION_NUMBER) len = MAX_CONFIGURATION_NUMBER - 1;
+//                 json_data.substring(start, end).toCharArray(functions[i], len + 1);
+//             } 
+//             else 
+//             {
+//                 functions[i][0] = '\0';
+//             }
+//         } 
+//         else 
+//         {
+//             functions[i][0] = '\0';
+//         }
+//     }
+// }
+
+void parse_json(String json_data, String functions[MAX_BTN_NUMBER]) 
 {
-    for (int i = 0; i < 8; i++) 
+    for (int i = 0; i < MAX_BTN_NUMBER; i++) 
     {
         String key = "\"btn_" + String(i + 1) + "\":\"";
         int start = json_data.indexOf(key);

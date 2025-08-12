@@ -17,9 +17,6 @@ Shortcut Deck is an Arduino project that manages programmable button configurati
 - Arduino Micro or any USB HID compatible device
 - Arduino libraries:
   - Keyboard
-  - UnorderedMap
-  - Hashtable
-  - SimpleVector
 
 ## Usage
 

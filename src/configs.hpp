@@ -1,0 +1,4 @@
+
+
+#define MAX_BTN_NUMBER 9
+#define MAX_CONFIGURATION_NUMBER 2
