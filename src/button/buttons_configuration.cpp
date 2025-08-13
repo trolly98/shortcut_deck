@@ -112,6 +112,11 @@ const ButtonsConfiguration::index_t ButtonsConfiguration::current_index() const
   return _cfg_selected;
 }
 
+const ButtonsConfiguration::index_t ButtonsConfiguration::config_count() const
+{
+  return _config_size;
+}
+
 void ButtonsConfiguration::_save_data()
 {
   int addr = 0;

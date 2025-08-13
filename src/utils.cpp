@@ -1,5 +1,5 @@
 #include "utils.hpp"
-
+#include "globals.hpp"
 #include <Arduino.h>
 
 #if defined(__AVR__)
@@ -23,3 +23,10 @@ void printFreeMemory() {
   Serial.println(freeMemory());
 }
 #endif
+
+void update_display()
+{
+  global_display_manager.display()->print_configuration(global_buttons_configuration.get_selected_configuration_btn(), 
+                                             global_buttons_configuration.current_index() + 1,
+                                             global_buttons_configuration.config_count());
+}

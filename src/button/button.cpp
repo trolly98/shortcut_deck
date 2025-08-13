@@ -19,7 +19,7 @@ Button::Button() : Button(0) {}
 Button::Button(const Button& button) : Button(button._pin) {}
 
 
-void Button::press(bool state)
+void Button::_press(bool state)
 {
   if(state == _pressed || (millis() - _last_pressed_time <= DEBOUNCE_TIME_MS))
   {
@@ -43,7 +43,7 @@ void Button::update()
   {
     return;
   }
-  this->press(!digitalRead(_pin));
+  this->_press(!digitalRead(_pin));
 }
 
 const Button::pin_number_t Button::pin() const

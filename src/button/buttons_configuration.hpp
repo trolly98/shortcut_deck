@@ -31,6 +31,7 @@ public:
 
   void print_configuration();
   const index_t current_index() const;
+  const index_t config_count() const;
 
 private:
   void _save_data();

@@ -14,7 +14,6 @@ public:
   Button(const Button& button);
   Button(pin_number_t pin);
 
-  void press(bool state);
   void update();
 
   const pin_number_t pin() const;
@@ -25,6 +24,7 @@ protected:
   virtual void released() = 0;
 
 private:
+  void _press(bool state);
   pin_number_t _pin;
   unsigned long _last_pressed_time;
   bool _pressed;

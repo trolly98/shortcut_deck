@@ -2,6 +2,7 @@
 
 #include "serial_line_parser.hpp"
 #include "globals.hpp"
+#include "utils.hpp"
 
 bool exec_cmd(const CommandResult &cmd_result)
 {
@@ -27,7 +28,13 @@ bool exec_cmd(const CommandResult &cmd_result)
     {
       const ButtonsConfiguration::index_t index 
         = static_cast<ButtonsConfiguration::index_t>(cmd_result.payload.toInt());
-      global_buttons_configuration.remove_configuration(index);
+      if (index <= 0)
+      {
+        Serial.println(F("Invalid configuration index!"));
+        return false;
+      }
+      global_buttons_configuration.remove_configuration(index-1);
+      update_display();
       return true;
     }
     

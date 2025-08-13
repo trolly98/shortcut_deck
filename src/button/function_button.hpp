@@ -5,7 +5,7 @@
 #include "../parsers/special_key_factory.hpp"
 #include "../converters/keyboard_key_converter.hpp"
 
-#define MAX_SPECIAL_KEYS 2
+#define MAX_SPECIAL_KEYS 3
 
 class FunctionButton : public Button
 {
