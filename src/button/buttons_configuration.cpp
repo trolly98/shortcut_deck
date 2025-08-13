@@ -10,7 +10,9 @@ ButtonsConfiguration::ButtonsConfiguration() :
 
 bool ButtonsConfiguration::init()
 {
+  EEPROM.begin(2200);
   this->_load_data();
+  return true;
 }
 
 bool ButtonsConfiguration::configuration_available()
@@ -24,7 +26,10 @@ bool ButtonsConfiguration::add_configuration(const function_t function_list[MAX_
   {
     return false;
   }
-  this->_save_data();
+  if (_config_size > 0)
+  {
+    this->select_configuration(_config_size-1);
+  }
   return true;
 }
 
@@ -84,6 +89,8 @@ void ButtonsConfiguration::print_configuration()
     {
       Serial.print(F("["));
       Serial.print(b);
+      Serial.print(F("-"));
+      Serial.print(btnArr->buttons[b]->pin());
       Serial.print(F("] "));
       Serial.print(FunctionButton::get_number_string(
                      btnArr->buttons[b]->number()
@@ -139,6 +146,8 @@ void ButtonsConfiguration::_save_data()
       EEPROM.update(addr++, selStr[i]);
   }
   EEPROM.update(addr++, '\0');
+  EEPROM.commit();
+  Serial.println(F("Configuration saved!"));
 }
 
 void ButtonsConfiguration::_load_data()
@@ -176,8 +185,8 @@ void ButtonsConfiguration::_load_data()
     matrixData += ch;
   }
 
-  // //Serial.println("Read Matrixdata: " + String(matrixData));
-  // //Serial.println("Selected: " + String(selected));
+  Serial.println("Read Matrixdata: " + String(matrixData));
+  Serial.println("Selected: " + String(selected));
 
   String function[MAX_BTN_NUMBER];   // array per le celle della riga
   int cellIndex = 0;    // indice cella corrente
@@ -212,7 +221,7 @@ void ButtonsConfiguration::_load_data()
 
               if(!this->_add_configuration(function))
               {
-                //Serial.println("Add configuration FAILED!");
+                Serial.println(F("Add configuration FAILED!"));
               }
 
               // Reset per la nuova riga
@@ -225,7 +234,8 @@ void ButtonsConfiguration::_load_data()
       }
   }
 
-  //Serial.println("Selected: " + String(selected));
+  Serial.print(F("Selected: "));
+  Serial.println(String(selected));
   this->_select_configuration(selected);
 }
 
@@ -237,19 +247,15 @@ bool ButtonsConfiguration::_add_configuration(const function_t function_list[MAX
     Serial.println(MAX_CONFIGURATION_NUMBER);
     return false;
   }
-
-  printFreeMemory();
   ButtonArray* arr = new ButtonArray();
   for (int i = 0; i < MAX_BTN_NUMBER; i++) 
   {
-    printFreeMemory();
     const FunctionButton::Number number = FunctionButton::get_number(i);
     arr->buttons[i] = new FunctionButton(number, function_list[i]);
-    printFreeMemory();
   }
   _config[_config_size++] = arr;
-  //Serial.println("Add configuration done, config size: " + String(_config_size));
-  printFreeMemory();
+  Serial.print(F("Add configuration done, config size: "));
+  Serial.println(_config_size);
   return true;
 }
 
@@ -276,7 +282,7 @@ bool ButtonsConfiguration::_remove_configuration(index_t index)
 {
   if (_config_size < 1)
   {
-    //Serial.println("No configuration saved!");
+    Serial.println("No configuration saved!");
     return false;
   }
   if (index < _config_size && _config[index] != nullptr) 
@@ -299,7 +305,7 @@ bool ButtonsConfiguration::_remove_configuration(index_t index)
     }
     _config[_config_size - 1] = nullptr;
     _config_size--;
-    //Serial.println("Remove configuration INDEX: " + String(index) + " done!");
+    Serial.println("Remove configuration INDEX: " + String(index) + " done!");
 
     if (_cfg_selected >= index)
     {
@@ -308,6 +314,6 @@ bool ButtonsConfiguration::_remove_configuration(index_t index)
     return true;
   }
 
-  //Serial.println("Remove configuration INDEX: " + String(index) + " not found!");
+  Serial.println("Remove configuration INDEX: " + String(index) + " not found!");
   return false;
 }

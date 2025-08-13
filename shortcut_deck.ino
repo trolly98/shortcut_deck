@@ -7,7 +7,7 @@ void setup() {
 
 void loop() {
   static unsigned long lastMillis = 0;
-  if (millis() - lastMillis >= 1500) {
+  if (millis() - lastMillis >= 10000) {
     lastMillis = millis();
     printFreeMemory();
   }

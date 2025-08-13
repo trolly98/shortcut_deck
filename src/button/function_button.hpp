@@ -1,8 +1,6 @@
 #pragma once
 
 #include "button.hpp"
-#include <Keyboard.h>
-
 #include "../parsers/key_parser.hpp"
 #include "../parsers/special_key_factory.hpp"
 #include "../converters/keyboard_key_converter.hpp"

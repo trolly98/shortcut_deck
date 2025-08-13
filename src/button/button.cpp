@@ -7,6 +7,8 @@ Button::Button(pin_number_t pin) :
 {
   if (!this->is_valid())
   {
+    Serial.print(F("Button is invalid! Pin: "));
+    Serial.println(_pin);
     return;
   }
   pinMode(this->pin(), INPUT_PULLUP);

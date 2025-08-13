@@ -6,6 +6,21 @@
 class ArduinoKeyboardKeyConverter : public KeyboardKeyConverter
 {
 public:
+    void press(uint8_t key) override
+    {
+        Keyboard.press(key);
+    }
+
+    void release(uint8_t key) override
+    {
+        Keyboard.release(key);
+    }
+
+    void print(const String& s) override
+    {
+        Keyboard.print(s);
+    }
+
     int operator()(const SpecialKey &key) const override
     {
         switch (key)

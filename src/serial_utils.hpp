@@ -17,7 +17,7 @@ void check_serial_config()
         CommandResult cmd_result = parse_serial_line(inputBuffer);
         if (!exec_cmd(cmd_result))
         {
-          //Serial.println("CMD execution failed!");
+          Serial.println(F("CMD execution failed!"));
         }
         inputBuffer = "";
       }

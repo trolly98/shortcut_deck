@@ -18,7 +18,6 @@ bool exec_cmd(const CommandResult &cmd_result)
     case CommandType::ADD_CFG:
     {
       String functions[MAX_BTN_NUMBER];
-      //char functions[MAX_CONFIGURATION_NUMBER][MAX_CONFIGURATION_NUMBER];
       parse_json(cmd_result.payload, functions);
       global_buttons_configuration.add_configuration(functions);
       return true;
@@ -40,12 +39,13 @@ bool exec_cmd(const CommandResult &cmd_result)
     
     case CommandType::SHOW_ACTUAL_CFG:
     {
-      //Serial.println("Current cfg index: " + String(global_buttons_configuration.current_index()));
+      Serial.print(F("Current cfg index: "));
+      Serial.println(String(global_buttons_configuration.current_index()));
       return true;
     }
     
     default:
-      //Serial.println(F("Unknown command!"));
+      Serial.println(F("Unknown command!"));
       return false;
   }
 }
