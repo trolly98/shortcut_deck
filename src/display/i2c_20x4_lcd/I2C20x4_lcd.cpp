@@ -33,6 +33,11 @@ void I2C20x4LCD::print(const String& text)
   lcd.print(text);
 }
 
+void I2C20x4LCD::show_logo()
+{
+    // Implement the logic to display the logo on the LCD
+}
+
 void I2C20x4LCD::print_configuration(const ButtonArray* config, 
                                      ButtonsConfiguration::index_t selected_config,
                                      ButtonsConfiguration::index_t config_count) const

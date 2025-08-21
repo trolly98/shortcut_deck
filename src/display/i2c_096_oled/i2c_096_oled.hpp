@@ -1,10 +1,10 @@
 #include "../display.hpp"
 
-class I2C20x4LCD : public Display
+class I2C096Oled : public Display
 {
 public:
-    I2C20x4LCD();
-    ~I2C20x4LCD();
+    I2C096Oled();
+    ~I2C096Oled();
     bool init() override;
     void clear() override;
     void print(const String& text) override;

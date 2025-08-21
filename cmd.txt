@@ -4,6 +4,9 @@ echo "SWITCH_CFG=2" > /dev/ttyACM0
 Aggiungere configurazione:
 echo "ADD_CFG={"btn_1":"ctrl", "btn_2":"ctrl+v"} > /dev/ttyACM0
 
+ADD_CFG={"btn_1":"ctrl", "btn_2":"ctrl+v", "btn_3":"ctrl+c", "btn_4":"ctrl+x", "btn_5":"ctrl+z", "btn_6":"ctrl+y", "btn_7":"ctrl+a", "btn_8":"ctrl+b", "btn_9":"ctrl+c"}
+
+
 Eliminare configurazione
 echo "RM_CFG=2" > /dev/ttyACM0
 
