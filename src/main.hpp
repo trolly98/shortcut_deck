@@ -45,7 +45,7 @@ void main_setup()
   global_display_manager.init();
   global_buttons_configuration.init();
   delay(100);
-  update_display();
+  //update_display();
 }
 
 void main_loop() 

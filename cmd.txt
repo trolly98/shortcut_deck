@@ -38,3 +38,4 @@ name: "General"
 9	ctrl+shift+T	Riapri ultima scheda del browser
 
 echo 'ADD_CFG={"name":"General","btn_1":"ctrl+alt+t", "btn_2":"ctrl+c", "btn_3":"ctrl+v", "btn_4":"ctrl+z", "btn_5":"ctrl+shift+z", "btn_6":"alt+tab", "btn_7":"ctrl+s", "btn_8":"win+d", "btn_9":"ctrl+shift+t"}' > /dev/ttyACM0
+echo 'ADD_CFG={"name":"Coder","btn_1":"cmake ..+enter", "btn_2":"make -j12", "btn_3":"", "btn_4":"ctrl+alt+t", "btn_5":"ctrl+shift+z", "btn_6":"alt+tab", "btn_7":"ctrl+s", "btn_8":"win+d", "btn_9":"ctrl+shift+t"}' > /dev/ttyACM0
