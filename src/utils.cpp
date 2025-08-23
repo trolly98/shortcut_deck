@@ -30,3 +30,8 @@ void update_display()
                                              global_buttons_configuration.current_index() + 1,
                                              global_buttons_configuration.config_count());
 }
+
+void show_display_info()
+{
+  global_display_manager.display()->show_info();
+}

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "serial_utils.hpp"
 #include "utils.hpp"
 #include "globals.hpp"
@@ -6,6 +8,7 @@
 #define SWITCH_CFG_BTN_PIN 12
 
 volatile int old_current_config = -2;
+bool show_info = false;
 
 class SwitchCfgButton : public Button
 {
@@ -14,8 +17,19 @@ public:
 
 protected:
   void pressed() override{}
+  void long_pressed() override
+  {
+    show_info = true;
+  }
   void released() override
   {
+    if (show_info)
+    {
+      show_info = false;
+      update_display();
+      return;
+    }
+
     global_buttons_configuration.select_configuration((global_buttons_configuration.current_index() + 1) % global_buttons_configuration.config_count());
   }
 };
@@ -36,6 +50,13 @@ void main_setup()
 
 void main_loop() 
 {
+  switch_cfg_button.update();
+  if (show_info)
+  {
+    show_display_info();
+    return;
+  }
+  
   check_serial_config();
 
   if (global_buttons_configuration.configuration_available())
@@ -53,11 +74,11 @@ void main_loop()
     }
   }
 
-  switch_cfg_button.update();
-
   if (old_current_config != global_buttons_configuration.current_index())
   {
     old_current_config = global_buttons_configuration.current_index();
     update_display();
   }
+
+
 }

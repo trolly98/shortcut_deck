@@ -37,6 +37,7 @@ public:
 
 protected:
   virtual void pressed() override;
+  virtual void long_pressed() override;
   virtual void released() override;
 
 private:

@@ -5,6 +5,7 @@
 #include <Arduino.h>
 
 constexpr uint8_t DEBOUNCE_TIME_MS = 30;
+constexpr uint32_t LONG_PRESS_THRESHOLD_MS = 1000;
 
 class Button 
 {
@@ -21,11 +22,14 @@ public:
 
 protected:
   virtual void pressed() = 0;
+  virtual void long_pressed() = 0;
   virtual void released() = 0;
 
 private:
   void _press(bool state);
   pin_number_t _pin;
   unsigned long _last_pressed_time;
+  unsigned long _long_pressed_time;
+  bool _long_pressed;
   bool _pressed;
 };

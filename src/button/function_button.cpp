@@ -102,6 +102,11 @@ void FunctionButton::pressed()
     });
 }
 
+void FunctionButton::long_pressed()
+{
+    return;
+}
+
 void FunctionButton::released()
 {
     this->_action(  

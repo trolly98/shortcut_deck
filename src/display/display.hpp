@@ -8,10 +8,11 @@ class Display
 public:
     explicit Display() = default;
     ~Display() = default;
-    virtual bool init() = 0;
-    virtual void clear() = 0;
-    virtual void print(const String& text) = 0;
-    virtual void show_logo() = 0;
+    virtual bool init() const = 0;
+    virtual void clear() const = 0;
+    virtual void print(const String& text) const = 0;
+    virtual void show_logo() const = 0;
+    virtual void show_info() const = 0;
 
     virtual void print_configuration(const ButtonArray* config, 
                                      ButtonsConfiguration::index_t selected_config,

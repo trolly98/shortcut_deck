@@ -3,7 +3,9 @@
 Button::Button(pin_number_t pin) : 
   _pin(pin),
   _last_pressed_time{0},
-  _pressed{false}
+  _pressed{false},
+  _long_pressed_time{0},
+  _long_pressed{false}
 {
   if (!this->is_valid())
   {
@@ -21,20 +23,50 @@ Button::Button(const Button& button) : Button(button._pin) {}
 
 void Button::_press(bool state)
 {
-  if(state == _pressed || (millis() - _last_pressed_time <= DEBOUNCE_TIME_MS))
-  {
-    return;
-  }
-  _last_pressed_time = millis();
-  if (state)
-  {
-    this->pressed();
-  }
-  else
-  {
-    this->released();
-  }
-  _pressed = state;
+    if ((millis() - _last_pressed_time <= DEBOUNCE_TIME_MS))
+    {
+        return;
+    }
+
+    if (state == _pressed)
+    {
+      if (!state)
+      {
+        return;
+      }
+      
+      if (_long_pressed_time == 0)
+      {
+          _long_pressed_time = millis();
+          _long_pressed = false;
+      }
+
+      if (!_long_pressed && (millis() - _long_pressed_time >= LONG_PRESS_THRESHOLD_MS))
+      {
+          Serial.println("LONG PRESS");
+          _long_pressed = true;
+          this->long_pressed();
+      }
+      return;
+    }
+
+    _last_pressed_time = millis();
+
+    if (state)
+    {
+        this->pressed();
+    }
+    else
+    {
+        if (!_long_pressed)
+        {
+          this->released();
+        }
+        _long_pressed = false;
+        _long_pressed_time = 0;
+    }
+
+    _pressed = state;
 }
 
 void Button::update()

@@ -1,6 +1,8 @@
 #include "I2C20x4_lcd.hpp"
 #include <LiquidCrystal_I2C.h>
 
+#include "../../info.hpp"
+
 #define SDA_PIN 4
 #define SCL_PIN 5
 
@@ -14,7 +16,7 @@ I2C20x4LCD::~I2C20x4LCD()
 {
 }
 
-bool I2C20x4LCD::init()
+bool I2C20x4LCD::init() const
 {
     lcd.init();
     lcd.backlight();
@@ -23,19 +25,27 @@ bool I2C20x4LCD::init()
     return true;
 }
 
-void I2C20x4LCD::clear()
+void I2C20x4LCD::clear() const
 {
   lcd.clear();
 }
 
-void I2C20x4LCD::print(const String& text)
+void I2C20x4LCD::print(const String& text) const
 {
   lcd.print(text);
 }
 
-void I2C20x4LCD::show_logo()
+void I2C20x4LCD::show_logo() const
 {
     // Implement the logic to display the logo on the LCD
+}
+
+void I2C20x4LCD::show_info() const
+{
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Version: ");
+    lcd.print(VERSION);
 }
 
 void I2C20x4LCD::print_configuration(const ButtonArray* config, 

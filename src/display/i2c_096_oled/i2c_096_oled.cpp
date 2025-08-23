@@ -3,6 +3,8 @@
 #include <Adafruit_SSD1306.h>
 #include <Wire.h>
 
+#include "../../info.hpp"
+
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define FOOTER_HEIGHT 8
@@ -22,7 +24,7 @@ I2C096Oled::~I2C096Oled()
 {
 }
 
-bool I2C096Oled::init()
+bool I2C096Oled::init() const
 {
     Wire.setSDA(SDA_PIN);
     Wire.setSCL(SCL_PIN);
@@ -45,13 +47,13 @@ bool I2C096Oled::init()
     return true;
 }
 
-void I2C096Oled::clear()
+void I2C096Oled::clear() const
 {
   display.clearDisplay();
   display.display();
 }
 
-void I2C096Oled::print(const String& text)
+void I2C096Oled::print(const String& text) const
 {
   display.clearDisplay();
   display.setCursor(0, 0);
@@ -59,7 +61,7 @@ void I2C096Oled::print(const String& text)
   display.display();
 }
 
-void I2C096Oled::show_logo()
+void I2C096Oled::show_logo() const
 {
     display.clearDisplay();
     display.drawBitmap(
@@ -67,6 +69,59 @@ void I2C096Oled::show_logo()
         (SCREEN_HEIGHT - LOGO_HEIGHT) / 2,
         epd_bitmap_logo_little, LOGO_WIDTH, LOGO_HEIGHT, SSD1306_WHITE
     );
+    display.display();
+}
+
+void I2C096Oled::show_info() const
+{
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+
+    // Titolo centrato
+    const char* title = PROJECT;
+    int16_t x1, y1;
+    uint16_t w, h;
+    display.getTextBounds(title, 0, 0, &x1, &y1, &w, &h);
+    display.setCursor((SCREEN_WIDTH - w) / 2, 0);
+    display.println(title);
+
+    // Versione + Maintainer
+    display.setCursor(0, 12);
+    display.print(F("Ver: "));
+    display.println(VERSION);
+    display.setCursor(0, 22);
+    display.print(F("By : "));
+    display.println(MAINTAINER);
+
+    // Uptime
+    unsigned long uptime_s = millis() / 1000;
+    unsigned long sec = uptime_s % 60;
+    unsigned long min = (uptime_s / 60) % 60;
+    unsigned long hr  = uptime_s / 3600;
+    char uptime_buf[16];
+    sprintf(uptime_buf, "%02lu:%02lu:%02lu", hr, min, sec);
+    display.setCursor(0, 34);
+    display.print(F("Up : "));
+    display.println(uptime_buf);
+
+    // Footer: GitHub url croppato se troppo lungo
+    String url = GITHUB_URL;
+    int maxCharsPerLine = SCREEN_WIDTH / 6;
+    String line1 = url.substring(0, (url.length() < maxCharsPerLine) ? url.length() : maxCharsPerLine);
+    String line2;
+    if (url.length() > maxCharsPerLine) {
+        int endIndex = (url.length() < 2 * maxCharsPerLine) ? url.length() : 2 * maxCharsPerLine;
+        line2 = url.substring(maxCharsPerLine, endIndex);
+        if (url.length() > 2 * maxCharsPerLine) {
+            line2 = line2.substring(0, line2.length() - 2) + "..";
+        }
+    }
+    display.setCursor(0, SCREEN_HEIGHT - 2 * FOOTER_HEIGHT);
+    display.print(line1);
+    display.setCursor(0, SCREEN_HEIGHT - FOOTER_HEIGHT);
+    display.print(line2);
+
     display.display();
 }
 
