@@ -87,6 +87,8 @@ String FunctionButton::get_number_string(FunctionButton::Number number)
         return "BTN_7";
       case Number::BTN_8:
         return "BTN_8";
+      case Number::BTN_9:
+        return "BTN_9";
       default:
         return "UNKNOWN";
     }

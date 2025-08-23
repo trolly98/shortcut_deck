@@ -19,8 +19,9 @@ bool exec_cmd(const CommandResult &cmd_result)
     case CommandType::ADD_CFG:
     {
       String functions[MAX_BTN_NUMBER];
-      parse_json(cmd_result.payload, functions);
-      global_buttons_configuration.add_configuration(functions);
+      String function_name = extract_function_name(cmd_result.payload);
+      extract_functions(cmd_result.payload, functions);
+      global_buttons_configuration.add_configuration(functions, function_name);
       return true;
     }
 
@@ -35,6 +36,12 @@ bool exec_cmd(const CommandResult &cmd_result)
       }
       global_buttons_configuration.remove_configuration(index-1);
       update_display();
+      return true;
+    }
+
+    case CommandType::RM_ALL_CFG:
+    {
+      global_buttons_configuration.remove_all_configurations();
       return true;
     }
     

@@ -8,6 +8,7 @@ enum class CommandType
   SWITCH_CFG,
   ADD_CFG,
   RM_CFG,
+  RM_ALL_CFG,
   SHOW_CFG,
   SHOW_ACTUAL_CFG
 };
@@ -23,6 +24,7 @@ CommandType recognize_command(const String &cmdStr)
   if (cmdStr == "SWITCH_CFG") return CommandType::SWITCH_CFG;
   if (cmdStr == "ADD_CFG")    return CommandType::ADD_CFG;
   if (cmdStr == "RM_CFG")     return CommandType::RM_CFG;
+  if (cmdStr == "RM_ALL_CFG")     return CommandType::RM_ALL_CFG;
   if (cmdStr == "SHOW_CFG")   return CommandType::SHOW_CFG;
   if (cmdStr == "SHOW_ACTUAL_CFG")   return CommandType::SHOW_ACTUAL_CFG;
   return CommandType::UNKNOWN;
@@ -43,35 +45,23 @@ CommandResult parse_serial_line(const String &line)
   return {recognize_command(cmdStr), payload};
 }
 
-// void parse_json(const String &json_data, char functions[MAX_BTN_NUMBER][MAX_CONFIGURATION_NUMBER]) 
-// {
-//     for (int i = 0; i < MAX_BTN_NUMBER; i++) 
-//     {
-//         String key = "\"btn_" + String(i + 1) + "\":\"";
-//         int start = json_data.indexOf(key);
-//         if (start != -1) 
-//         {
-//             start += key.length();
-//             int end = json_data.indexOf("\"", start);
-//             if (end != -1) 
-//             {
-//                 int len = end - start;
-//                 if (len >= MAX_CONFIGURATION_NUMBER) len = MAX_CONFIGURATION_NUMBER - 1;
-//                 json_data.substring(start, end).toCharArray(functions[i], len + 1);
-//             } 
-//             else 
-//             {
-//                 functions[i][0] = '\0';
-//             }
-//         } 
-//         else 
-//         {
-//             functions[i][0] = '\0';
-//         }
-//     }
-// }
+String extract_function_name(const String &json_data)
+{
+  String key = "\"name\":\"";
+  int name_start = json_data.indexOf(key);
+  if (name_start != -1) 
+  {
+    name_start += key.length();
+    int name_end = json_data.indexOf("\"", name_start);
+    if (name_end != -1) 
+    {
+      return json_data.substring(name_start, name_end);
+    }
+  }
+  return "--";
+}
 
-void parse_json(String json_data, String functions[MAX_BTN_NUMBER]) 
+void extract_functions(const String &json_data, String functions[MAX_BTN_NUMBER]) 
 {
     for (int i = 0; i < MAX_BTN_NUMBER; i++) 
     {

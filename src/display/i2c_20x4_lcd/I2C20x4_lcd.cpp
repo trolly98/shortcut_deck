@@ -42,9 +42,9 @@ void I2C20x4LCD::print_configuration(const ButtonArray* config,
                                      ButtonsConfiguration::index_t selected_config,
                                      ButtonsConfiguration::index_t config_count) const
 {
-    if (!config) return;
-
     lcd.clear();
+
+    if (!config) return;
 
     // Stampiamo la matrice 3x3
     for (int row = 0; row < 3; row++) {

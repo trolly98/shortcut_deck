@@ -5,7 +5,7 @@
 
 #define SWITCH_CFG_BTN_PIN 12
 
-volatile int old_current_config = -1;
+volatile int old_current_config = -2;
 
 class SwitchCfgButton : public Button
 {
@@ -38,21 +38,18 @@ void main_loop()
 {
   check_serial_config();
 
-  if (!global_buttons_configuration.configuration_available())
+  if (global_buttons_configuration.configuration_available())
   {
-    return;
-  }
-  const ButtonArray* buttons_selected = global_buttons_configuration.get_selected_configuration_btn();
-  if (!buttons_selected)
-  {
-    return;
-  }
-
-  for(int i = 0; i < MAX_BTN_NUMBER; i++)
-  {
-    if (buttons_selected->buttons[i] != nullptr)
+    const ButtonArray* buttons_selected = global_buttons_configuration.get_selected_configuration_btn();
+    if (buttons_selected)
     {
-      buttons_selected->buttons[i]->update();
+        for(int i = 0; i < MAX_BTN_NUMBER; i++)
+      {
+        if (buttons_selected->buttons[i] != nullptr)
+        {
+          buttons_selected->buttons[i]->update();
+        }
+      }
     }
   }
 

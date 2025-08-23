@@ -13,4 +13,8 @@ public:
     void print_configuration(const ButtonArray* config, 
                              ButtonsConfiguration::index_t selected_config,
                              ButtonsConfiguration::index_t config_count) const override;
+private:
+    void _print_footer(const ButtonArray* config, 
+                       ButtonsConfiguration::index_t selected_config,
+                       ButtonsConfiguration::index_t config_count) const;
 };

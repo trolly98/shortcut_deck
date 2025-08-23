@@ -1,7 +1,7 @@
 #include "buttons_configuration.hpp"
 
 ButtonsConfiguration::ButtonsConfiguration() : 
-  _cfg_selected{0},
+  _cfg_selected{-1},
   _buttons_selected{nullptr},
   _config{nullptr},
   _config_size{0}
@@ -20,9 +20,10 @@ bool ButtonsConfiguration::configuration_available()
   return (_config_size > 0);
 }
 
-bool ButtonsConfiguration::add_configuration(const function_t function_list[MAX_BTN_NUMBER])
+bool ButtonsConfiguration::add_configuration(const function_t function_list[MAX_BTN_NUMBER], 
+                                             const String& name)
 {
-  if(!this->_add_configuration(function_list))
+  if(!this->_add_configuration(function_list, name))
   {
     return false;
   }
@@ -38,6 +39,20 @@ bool ButtonsConfiguration::remove_configuration(index_t index)
   if(!this->_remove_configuration(index))
   {
     return false;
+  }
+  this->_save_data();
+  return true;
+}
+
+bool ButtonsConfiguration::remove_all_configurations()
+{
+  for (index_t i = _config_size - 1; i >= 0; --i)
+  {
+    if (!this->_remove_configuration(i))
+    {
+      Serial.println("Failed to remove configuration at index: " + String(i));
+      return false;
+    }
   }
   this->_save_data();
   return true;
@@ -83,7 +98,9 @@ void ButtonsConfiguration::print_configuration()
     if (!btnArr) continue;
 
     Serial.print(F("Config INDEX "));
-    Serial.println(index);
+    Serial.print(index);
+    Serial.print(F(" - Name: "));
+    Serial.println(btnArr->name());
 
     for (int b = 0; b < MAX_BTN_NUMBER; b++)
     {
@@ -129,7 +146,7 @@ void ButtonsConfiguration::_save_data()
       {
         continue;
       }
-
+      matrixStr += btnArr->name() + ':';
       for (int b = 0; b < MAX_BTN_NUMBER; b++)
       {
           matrixStr += btnArr->buttons[b]->key();
@@ -196,18 +213,24 @@ void ButtonsConfiguration::_load_data()
   String function[MAX_BTN_NUMBER];   // array per le celle della riga
   int cellIndex = 0;    // indice cella corrente
   String cell = "";
+  String function_name = "--";
 
   for (int pos = 0; pos < matrixData.length(); pos++) 
   {
       char ch = matrixData[pos];
-
-      if (ch == ',' || ch == '\n') 
+      if (ch == ':')
+      {
+          function_name = cell;
+          cell = "";
+      }
+      else if (ch == ',' || ch == '\n') 
       {
           // Salva la cella in function, se c'è spazio
           if (cellIndex < MAX_BTN_NUMBER)
           {
               function[cellIndex++] = cell;
           }
+
           cell = "";
 
           if (ch == '\n') 
@@ -224,7 +247,7 @@ void ButtonsConfiguration::_load_data()
               // }
               //Serial.println();
 
-              if(!this->_add_configuration(function))
+              if(!this->_add_configuration(function, function_name))
               {
                 Serial.println(F("Add configuration FAILED!"));
               }
@@ -234,7 +257,8 @@ void ButtonsConfiguration::_load_data()
               for (int i = 0; i < MAX_BTN_NUMBER; i++) function[i] = "";
           }
       } 
-      else {
+      else 
+      {
           cell += ch;  // accumulo carattere
       }
   }
@@ -244,7 +268,8 @@ void ButtonsConfiguration::_load_data()
   this->_select_configuration(selected);
 }
 
-bool ButtonsConfiguration::_add_configuration(const function_t function_list[MAX_BTN_NUMBER])
+bool ButtonsConfiguration::_add_configuration(const function_t function_list[MAX_BTN_NUMBER], 
+                                              const String& name)
 {
   if (_config_size >= MAX_CONFIGURATION_NUMBER)
   {
@@ -252,7 +277,7 @@ bool ButtonsConfiguration::_add_configuration(const function_t function_list[MAX
     Serial.println(MAX_CONFIGURATION_NUMBER);
     return false;
   }
-  ButtonArray* arr = new ButtonArray();
+  ButtonArray* arr = new ButtonArray(name);
   for (int i = 0; i < MAX_BTN_NUMBER; i++) 
   {
     const FunctionButton::Number number = FunctionButton::get_number(i);
@@ -266,19 +291,22 @@ bool ButtonsConfiguration::_add_configuration(const function_t function_list[MAX
 
 bool ButtonsConfiguration::_select_configuration(index_t index)
 {
-  if (_cfg_selected == index)
+  if (index >= _config_size)
   {
-    //Serial.println("Selected same configuration with index: " + String(index));
-    return true;
-  }
-
-  const auto btn_selected = this->get_configuration_btn(index);
-  if (!btn_selected)
-  {
+    Serial.print(F("Configuration index: "));
+    Serial.print(index);
+    Serial.println(F(" out of range!"));
     return false;
   }
+  if (_cfg_selected == index)
+  {
+    Serial.print(F("Selected same configuration with index: "));
+    Serial.println(index);
+    return false;
+  }
+
   _cfg_selected = index;
-  _buttons_selected = btn_selected;
+  _buttons_selected = this->get_configuration_btn(index);
   //Serial.println("Configuration index: " + String(index) + " selected!");
   return true;
 }
@@ -314,7 +342,7 @@ bool ButtonsConfiguration::_remove_configuration(index_t index)
 
     if (_cfg_selected >= index)
     {
-      this->_select_configuration(0);
+      this->_select_configuration(_cfg_selected - 1);
     }
     return true;
   }

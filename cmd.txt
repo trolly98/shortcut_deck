@@ -21,3 +21,6 @@ echo "SHOW_ACTUAL_CFG" > /dev/ttyACM0
   uint8_t _config_size;
   index_t _cfg_selected;
   ButtonArray* _buttons_selected;
+
+
+echo "ADD_CFG={"btn_1":"btn_1", "btn_2":"btn_2", "btn_3":"btn_3", "btn_4":"btn_4", "btn_5":"btn_5", "btn_6":"btn_6", "btn_7":"btn_7", "btn_8":"btn_8", "btn_9":"btn_9"} > /dev/ttyACM0
