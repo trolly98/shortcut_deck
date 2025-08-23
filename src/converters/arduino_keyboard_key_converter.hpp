@@ -40,6 +40,7 @@ public:
             case SpecialKey::KeyType::ARROW_DOWN:  return KEY_DOWN_ARROW;
             case SpecialKey::KeyType::ARROW_LEFT:  return KEY_LEFT_ARROW;
             case SpecialKey::KeyType::ARROW_RIGHT: return KEY_RIGHT_ARROW;
+            case SpecialKey::KeyType::WIN:         return KEY_LEFT_GUI;
             case SpecialKey::KeyType::FUNCTION_1:  return KEY_F1;
             case SpecialKey::KeyType::FUNCTION_2:  return KEY_F2;
             case SpecialKey::KeyType::FUNCTION_3:  return KEY_F3;

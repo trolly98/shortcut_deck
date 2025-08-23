@@ -21,6 +21,7 @@ public:
     ARROW_DOWN,
     ARROW_LEFT,
     ARROW_RIGHT,
+    WIN,
     FUNCTION_1,
     FUNCTION_2,
     FUNCTION_3,

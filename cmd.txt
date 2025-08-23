@@ -24,3 +24,17 @@ echo "SHOW_ACTUAL_CFG" > /dev/ttyACM0
 
 
 echo "ADD_CFG={"btn_1":"btn_1", "btn_2":"btn_2", "btn_3":"btn_3", "btn_4":"btn_4", "btn_5":"btn_5", "btn_6":"btn_6", "btn_7":"btn_7", "btn_8":"btn_8", "btn_9":"btn_9"} > /dev/ttyACM0
+
+
+name: "General"
+1 ctrl+alt+t
+2	ctrl+C	Copia rapido
+3	ctrl+V	Incolla subito
+4	ctrl+Z	Annulla operazione
+5	ctrl+shift+z	Rifai operazione
+6	alt+Tab	Passa tra finestre/appl.
+7	ctrl+S	Salva documento/progetto
+8	win+D	Mostra Desktop
+9	ctrl+shift+T	Riapri ultima scheda del browser
+
+echo 'ADD_CFG={"name":"General","btn_1":"ctrl+alt+t", "btn_2":"ctrl+c", "btn_3":"ctrl+v", "btn_4":"ctrl+z", "btn_5":"ctrl+shift+z", "btn_6":"alt+tab", "btn_7":"ctrl+s", "btn_8":"win+d", "btn_9":"ctrl+shift+t"}' > /dev/ttyACM0

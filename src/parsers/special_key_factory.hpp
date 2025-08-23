@@ -110,6 +110,10 @@ public:
     {
         return new SpecialKey(SpecialKey::KeyType::ARROW_RIGHT);
     }
+    else if (k == "win")
+    {
+        return new SpecialKey(SpecialKey::KeyType::WIN);
+    }
     return new SpecialKey(SpecialKey::KeyType::TEXT, key);
   }
 };
