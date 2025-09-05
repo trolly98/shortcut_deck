@@ -124,6 +124,50 @@ void ButtonsConfiguration::print_configuration()
   }
 }
 
+void ButtonsConfiguration::print_actual_configuration()
+{
+  Serial.print(F("CURRENT CONFIGURATION INDEX: "));
+  Serial.println(_cfg_selected);
+
+  if (_cfg_selected < 0 || _cfg_selected >= _config_size)
+  {
+    Serial.println(F("---------------------------"));
+    return;
+  }
+
+  ButtonArray* btnArr = _config[_cfg_selected];
+  if (!btnArr) 
+  {
+    Serial.println(F("---------------------------"));
+    return;
+  }
+
+  Serial.print(F("Config INDEX "));
+  Serial.print(_cfg_selected);
+  Serial.print(F(" - Name: "));
+  Serial.println(btnArr->name());
+
+  for (int b = 0; b < MAX_BTN_NUMBER; b++)
+  {
+    Serial.print(F("["));
+    Serial.print(b);
+    Serial.print(F("-"));
+    Serial.print(btnArr->buttons[b]->pin());
+    Serial.print(F("] "));
+    Serial.print(FunctionButton::get_number_string(
+                   btnArr->buttons[b]->number()
+                 ));
+    Serial.print(F("("));
+    Serial.print(btnArr->buttons[b]->key());
+    Serial.print(F(")"));
+
+    if (b < MAX_BTN_NUMBER - 1)
+      Serial.print(F(", "));
+  }
+  Serial.println();
+  Serial.println(F("---------------------------"));
+}
+
 const ButtonsConfiguration::index_t ButtonsConfiguration::current_index() const
 {
   return _cfg_selected;

@@ -10,7 +10,9 @@ enum class CommandType
   RM_CFG,
   RM_ALL_CFG,
   SHOW_CFG,
-  SHOW_ACTUAL_CFG
+  SHOW_ACTUAL_CFG,
+  SHOW_ACTUAL_CFG_INDEX,
+  SHOW_CFG_INDEXES
 };
 
 struct CommandResult 
@@ -27,6 +29,8 @@ CommandType recognize_command(const String &cmdStr)
   if (cmdStr == "RM_ALL_CFG")     return CommandType::RM_ALL_CFG;
   if (cmdStr == "SHOW_CFG")   return CommandType::SHOW_CFG;
   if (cmdStr == "SHOW_ACTUAL_CFG")   return CommandType::SHOW_ACTUAL_CFG;
+  if (cmdStr == "SHOW_ACTUAL_CFG_INDEX")   return CommandType::SHOW_ACTUAL_CFG_INDEX;
+  if (cmdStr == "SHOW_CFG_INDEXES")   return CommandType::SHOW_CFG_INDEXES;
   return CommandType::UNKNOWN;
 }
 

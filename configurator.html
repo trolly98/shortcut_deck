@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>shortcut-deck Configurator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  body {
+    font-family: 'Share Tech Mono', monospace;
+    background: #0d0d0d;
+    color: #00fffa;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  h1 {
+    color: #ff00ff;
+    text-shadow: 0 0 5px #ff00ff, 0 0 10px #00ffff;
+    margin: 20px 0 10px 0;
+  }
+
+  #connect-btn {
+    padding:12px 24px;
+    font-weight:bold;
+    margin-bottom:20px;
+    border: 2px solid #0ff;
+    border-radius: 8px;
+    background: #ff0033;
+    color:white;
+    cursor:pointer;
+    text-transform: uppercase;
+    transition: 0.3s;
+    font-size: 1.1em;
+  }
+  #connect-btn.green { background:#00cc33; border-color:#0f0; }
+  #connect-btn:hover { box-shadow: 0 0 10px #0ff, 0 0 20px #ff0; }
+
+  #main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    flex: 1;
+    width: 100%;
+  }
+
+  #controls-left, #controls-right {
+    display:flex;
+    flex-direction: column;
+    gap: 15px;
+    justify-content: flex-start;
+  }
+
+  .small-btn {
+    width:140px;
+    height:48px;
+    font-size:1.1em;
+    border:1px solid #0ff;
+    border-radius:6px;
+    background:#111;
+    color:#0ff;
+    cursor:pointer;
+    text-transform: uppercase;
+    transition: 0.2s;
+  }
+  .small-btn:hover { box-shadow: 0 0 12px #0ff; }
+
+  .row {
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+
+  select.small-btn {
+    width: 140px;
+    height: 48px;
+    font-size: 1.1em;
+    text-align: center;
+    background: #111;
+    color: #0ff;
+    border: 1px solid #0ff;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  #center-container {
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  #cfg-name {
+    width: 220px;
+    text-align:center;
+    padding:6px;
+    background:#111;
+    border:1px solid #0ff;
+    color:#0ff;
+    border-radius:5px;
+    font-size:1.1em;
+    transition: all 0.2s;
+  }
+  #cfg-name:hover {
+    box-shadow: 0 0 12px #0ff;
+    background: #222;
+  }
+
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: max-content;
+  }
+
+  .grid-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width:110px;
+    height:110px;
+    font-size:1.1em;
+    border:1px solid #0ff;
+    padding:5px;
+    background:#111;
+    color:#0ff;
+    border-radius:6px;
+    cursor:text;
+    transition: 0.2s;
+  }
+  .grid-btn:hover {
+    color: #ff00ff;
+    border-color: #ff00ff;
+    box-shadow: 0 0 8px #ff00ff, 0 0 16px #00ffff;
+    background: linear-gradient(135deg, #111, #222);
+    transform: scale(1.05);
+    transition: all 0.2s ease-in-out;
+  }
+  .grid-btn:focus { outline:2px solid #ff0; background:#222; }
+
+  #btn-rm-all {
+    width:140px;
+    height:48px;
+    font-size:1.1em;
+    border:1px solid #ff5555;
+    border-radius:6px;
+    background:#330000;
+    color:#ff7777;
+    cursor:pointer;
+    text-transform: uppercase;
+    margin-top:5px;
+    transition: 0.2s;
+  }
+  #btn-rm-all:hover {
+    color:#ffaaaa;
+    border-color:#ff7777;
+    box-shadow: 0 0 10px #ff5555, 0 0 20px #aa0000;
+    background:#440000;
+  }
+
+  #status-msg {
+    color:#ff7777;
+    font-weight:bold;
+    margin-bottom:5px;
+    text-align:center;
+    min-height: 1.2em;
+  }
+</style>
+</head>
+<body>
+
+<h1>shortcut-deck Configurator</h1>
+
+<button id="connect-btn">Connect</button>
+
+<div id="main-container">
+
+  <!-- Colonna sinistra -->
+  <div id="controls-left">
+    <div id="status-msg"></div>
+    <button class="small-btn" id="btn-show-actual">Update</button>
+    <button class="small-btn" id="btn-add-cfg">Add Config</button>
+    <button class="small-btn" id="btn-clear">Clear</button>
+  </div>
+
+  <!-- Centro: input + griglia -->
+  <div id="center-container">
+    <input id="cfg-name" placeholder="Configuration Name">
+    <div id="grid"></div>
+  </div>
+
+  <!-- Colonna destra -->
+  <div id="controls-right">
+    <div class="row">
+      <button id="btn-rm-cfg" class="small-btn">Remove</button>
+      <select id="rm-select" class="small-btn"></select>
+    </div>
+    <div class="row">
+      <button id="btn-switch-cfg" class="small-btn">Switch</button>
+      <select id="switch-select" class="small-btn"></select>
+    </div>
+    <button id="btn-rm-all">Remove All</button>
+  </div>
+
+</div>
+
+<script>
+let port, writer, reader;
+const textDecoder = new TextDecoder();
+const encoder = new TextEncoder();
+let bufferShowActualCfg = null;
+let bufferShowIndexes = "";
+
+const grid = document.getElementById("grid");
+const btnInputs = [];
+for (let i = 0; i < 9; i++) {
+  const btn = document.createElement("div");
+  btn.className = "grid-btn";
+  btn.contentEditable = true;
+  btn.textContent = "";
+  grid.appendChild(btn);
+  btnInputs.push(btn);
+}
+
+function isConnected() { return port && writer; }
+
+const connectBtn = document.getElementById("connect-btn");
+connectBtn.onclick = async () => {
+  if (!port) {
+    try {
+      port = await navigator.serial.requestPort();
+      await port.open({ baudRate:115200 });
+      writer = port.writable.getWriter();
+      reader = port.readable.getReader();
+      connectBtn.textContent="Disconnect";
+      connectBtn.classList.add("green");
+      readLoop();
+      await updateAll();
+    } catch(e) { console.error(e); alert("Connection failed"); }
+  } else {
+    if (reader) { await reader.cancel(); reader=null; }
+    if (writer) { writer.releaseLock(); writer=null; }
+    if (port) { await port.close(); port=null; }
+    connectBtn.textContent="Connect";
+    connectBtn.classList.remove("green");
+    document.getElementById("cfg-name").value = "";
+    btnInputs.forEach(b => b.textContent = "");
+    document.getElementById("rm-select").innerHTML = "";
+    document.getElementById("switch-select").innerHTML = "";
+  }
+};
+
+async function readLoop() {
+  while (port && reader) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    const text = textDecoder.decode(value);
+    handleSerialText(text);
+  }
+}
+
+function handleSerialText(text) {
+  const statusDiv = document.getElementById("status-msg");
+
+  if(bufferShowActualCfg !== null) {
+    bufferShowActualCfg += text;
+    if(bufferShowActualCfg.includes("---------------------------")) {
+      parseShowActualCfg(bufferShowActualCfg);
+      bufferShowActualCfg = null;
+    }
+  }
+
+  if(bufferShowIndexes !== null) {
+    bufferShowIndexes += text;
+    if(bufferShowIndexes.includes("Available configuration indexes:")){
+      const match = bufferShowIndexes.match(/Available configuration indexes:\s*(\d+);/);
+      if(match){
+        const n = parseInt(match[1]);
+        const rmSel = document.getElementById("rm-select");
+        const swSel = document.getElementById("switch-select");
+        rmSel.innerHTML = "";
+        swSel.innerHTML = "";
+        for(let i=1;i<=n;i++){
+          let o1=document.createElement("option"); o1.value=i; o1.textContent=i; rmSel.appendChild(o1);
+          let o2=document.createElement("option"); o2.value=i; o2.textContent=i; swSel.appendChild(o2);
+        }
+        bufferShowIndexes = "";
+      }
+    }
+  }
+}
+
+async function sendCommand(cmd) {
+  if (!writer) { alert("Not connected!"); return; }
+  await writer.write(encoder.encode(cmd + "\n"));
+}
+
+async function updateAll(){
+  bufferShowActualCfg = "";
+  bufferShowIndexes = "";
+  await sendCommand("SHOW_ACTUAL_CFG");
+  await sendCommand("SHOW_CFG_INDEXES");
+}
+
+// Bottoni
+document.getElementById("btn-show-actual").onclick = () => { if(isConnected()) updateAll(); };
+document.getElementById("btn-clear").onclick = () => {
+  document.getElementById("cfg-name").value="";
+  btnInputs.forEach(b=>b.textContent="");
+};
+document.getElementById("btn-add-cfg").onclick = async () => {
+  if(!isConnected()) return;
+  const name = document.getElementById("cfg-name").value.trim();
+  const obj = { name };
+  let hasData = name!=="";
+  btnInputs.forEach((b,i)=>{
+    obj["btn_"+(i+1)] = b.textContent.trim();
+    if(b.textContent.trim()!=="") hasData=true;
+  });
+  if(!hasData){ alert("No data to send!"); return; }
+  await sendCommand("ADD_CFG="+JSON.stringify(obj));
+  await updateAll();
+};
+document.getElementById("btn-rm-cfg").onclick = async () => { if(isConnected()) { const idx = document.getElementById("rm-select").value; if(idx) { await sendCommand("RM_CFG="+idx); await updateAll(); } } };
+document.getElementById("btn-switch-cfg").onclick = async () => { if(isConnected()) { const idx = document.getElementById("switch-select").value; if(idx) { await sendCommand("SWITCH_CFG="+idx); await updateAll(); } } };
+document.getElementById("btn-rm-all").onclick = async () => { if(isConnected()) { if(confirm("Are you sure? This will remove all configurations!")) { await sendCommand("RM_ALL_CFG"); await updateAll(); } } };
+
+// Parser SHOW_ACTUAL_CFG
+function parseShowActualCfg(text){
+  const statusDiv = document.getElementById("status-msg");
+  const indexMatch = text.match(/CURRENT CONFIGURATION INDEX:\s*(-?\d+)/);
+  if(indexMatch && parseInt(indexMatch[1]) === -1){
+    statusDiv.textContent = "No config";
+    btnInputs.forEach(b => b.textContent="");
+    document.getElementById("cfg-name").value = "";
+    return;
+  } else {
+    statusDiv.textContent = "";
+  }
+
+  const nameMatch = text.match(/Name:\s*(.+)/);
+  if(nameMatch) document.getElementById("cfg-name").value = nameMatch[1].trim();
+
+  const btnMatches = [...text.matchAll(/BTN_(\d)\((.*?)\)/g)];
+  btnMatches.forEach(m=>{
+    const idx = parseInt(m[1])-1;
+    btnInputs[idx].textContent = m[2];
+  });
+}
+
+// Inizializza griglia vuota
+btnInputs.forEach(b => b.textContent = "");
+</script>
+</body>
+</html>

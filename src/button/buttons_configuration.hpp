@@ -37,6 +37,7 @@ public:
   ButtonArray* get_configuration_btn(index_t index);
 
   void print_configuration();
+  void print_actual_configuration();
   const index_t current_index() const;
   const index_t config_count() const;
 

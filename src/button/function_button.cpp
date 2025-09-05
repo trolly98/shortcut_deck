@@ -55,7 +55,7 @@ const String &FunctionButton::key() const
     return _key;
 }
 
-const String &FunctionButton::short_key() const
+const String FunctionButton::short_key() const
 {
     String result = "";
     int start = 0;

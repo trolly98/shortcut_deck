@@ -26,8 +26,13 @@ I2C096Oled::~I2C096Oled()
 
 bool I2C096Oled::init() const
 {
+    Serial.println("Initializing I2C 0.96\" OLED display...");
+    Serial.print("SDA pin: "); Serial.println(SDA_PIN);
+    Serial.print("SCL pin: "); Serial.println(SCL_PIN);
     Wire.setSDA(SDA_PIN);
     Wire.setSCL(SCL_PIN);
+    Serial.println("Starting I2C...");
+    Serial.println("Calling Wire.begin()...");
     Wire.begin();
     if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) 
     {

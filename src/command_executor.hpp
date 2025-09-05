@@ -12,7 +12,7 @@ bool exec_cmd(const CommandResult &cmd_result)
     {
       const ButtonsConfiguration::index_t index 
         = static_cast<ButtonsConfiguration::index_t>(cmd_result.payload.toInt());
-      global_buttons_configuration.select_configuration(index);
+      global_buttons_configuration.select_configuration(index-1);
       return true;
     }
 
@@ -50,11 +50,26 @@ bool exec_cmd(const CommandResult &cmd_result)
       global_buttons_configuration.print_configuration();
       return true;
     }
-    
+
     case CommandType::SHOW_ACTUAL_CFG:
     {
-      Serial.print(F("Current cfg index: "));
-      Serial.println(String(global_buttons_configuration.current_index()));
+      global_buttons_configuration.print_actual_configuration();
+      return true;
+    }
+
+    case CommandType::SHOW_ACTUAL_CFG_INDEX:
+    {
+      Serial.print(F("Current configuration index: "));
+      Serial.print(global_buttons_configuration.current_index());
+      Serial.println(F(";"));
+      return true;
+    }
+
+    case CommandType::SHOW_CFG_INDEXES:
+    {
+      Serial.print(F("Available configuration indexes: "));
+      Serial.print(global_buttons_configuration.config_count());
+      Serial.println(F(";"));
       return true;
     }
     

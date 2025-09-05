@@ -5,7 +5,7 @@
 #include "globals.hpp"
 #include "button/button.hpp"
 
-#define SWITCH_CFG_BTN_PIN 12
+#define SWITCH_CFG_BTN_PIN 10
 
 volatile int old_current_config = -2;
 bool show_info = false;
@@ -41,7 +41,6 @@ void main_setup()
   delay(2000);
   Serial.println("--------- SHORTCUT_DECK INIT ---------");
   pinMode(SWITCH_CFG_BTN_PIN, INPUT_PULLUP);
-
   global_display_manager.init();
   global_buttons_configuration.init();
   delay(100);
