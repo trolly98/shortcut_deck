@@ -25,13 +25,13 @@ public:
   };
 
   FunctionButton(Number number, 
-                 const String &key);
+                 const String &key,
+                 const String &name);
   FunctionButton();
   ~FunctionButton();
 
   const Number number() const;
   const String &key() const;
-  const String short_key() const;
 
   static Number get_number(unsigned int value);
   static String get_number_string(Number number);

@@ -29,7 +29,10 @@ bool ButtonsConfiguration::add_configuration(const function_t function_list[MAX_
   }
   if (_config_size > 0)
   {
-    this->select_configuration(_config_size-1);
+    if (!this->select_configuration(_config_size-1))
+    {
+      this->_save_data();
+    }
   }
   return true;
 }
@@ -113,6 +116,8 @@ void ButtonsConfiguration::print_configuration()
                      btnArr->buttons[b]->number()
                    ));
       Serial.print(F("("));
+      Serial.print(btnArr->buttons[b]->name());
+      Serial.print(F(":"));
       Serial.print(btnArr->buttons[b]->key());
       Serial.print(F(")"));
 
@@ -158,6 +163,8 @@ void ButtonsConfiguration::print_actual_configuration()
                    btnArr->buttons[b]->number()
                  ));
     Serial.print(F("("));
+    Serial.print(btnArr->buttons[b]->name());
+    Serial.print(F(":"));
     Serial.print(btnArr->buttons[b]->key());
     Serial.print(F(")"));
 
@@ -180,137 +187,150 @@ const ButtonsConfiguration::index_t ButtonsConfiguration::config_count() const
 
 void ButtonsConfiguration::_save_data()
 {
-  int addr = 0;
-  String matrixStr = "";
+    constexpr size_t BUF_SIZE = 512; // adatta alla tua EEPROM
+    char buffer[BUF_SIZE];
+    size_t pos = 0;
 
-  for (index_t index = 0; index < _config_size; ++index)
-  {
-      ButtonArray* btnArr = _config[index];
-      if (btnArr == nullptr)
-      {
-        continue;
-      }
-      matrixStr += btnArr->name() + ':';
-      for (int b = 0; b < MAX_BTN_NUMBER; b++)
-      {
-          matrixStr += btnArr->buttons[b]->key();
-          if (b < MAX_BTN_NUMBER - 1)
-          {
-              matrixStr += ',';
-          }
-      }
-      matrixStr += '\n';
-  }
-  for (size_t i = 0; i < matrixStr.length(); i++) 
-  {
-      EEPROM.update(addr++, matrixStr[i]);
-  }
-  EEPROM.update(addr++, '#');
-  String selStr = String(_cfg_selected);
-  for (size_t i = 0; i < selStr.length(); i++) 
-  {
-      EEPROM.update(addr++, selStr[i]);
-  }
-  EEPROM.update(addr++, '\0');
-  EEPROM.commit();
-  Serial.println(F("Configuration saved!"));
+    for (index_t index = 0; index < _config_size; ++index)
+    {
+        ButtonArray* btnArr = _config[index];
+        if (!btnArr) continue;
+
+        // Nome config
+        int n = snprintf(buffer + pos, BUF_SIZE - pos, "%s:", btnArr->name().c_str());
+        if (n < 0 || (pos + n) >= BUF_SIZE) break;
+        pos += n;
+
+        for (int b = 0; b < MAX_BTN_NUMBER; b++)
+        {
+            FunctionButton* btn = btnArr->buttons[b];
+            if (!btn) continue;
+
+            n = snprintf(buffer + pos, BUF_SIZE - pos, "%s-%s",
+                         btn->name().c_str(), btn->key().c_str());
+            if (n < 0 || (pos + n) >= BUF_SIZE) break;
+            pos += n;
+
+            if (b < MAX_BTN_NUMBER - 1)
+            {
+                if (pos < BUF_SIZE - 1) buffer[pos++] = ',';
+                else break;
+            }
+        }
+
+        if (pos < BUF_SIZE - 1) buffer[pos++] = '\n';
+        else break;
+    }
+
+    // Terminatore configurazioni
+    if (pos < BUF_SIZE - 1) buffer[pos++] = '#';
+
+    // Config selezionata
+    int n = snprintf(buffer + pos, BUF_SIZE - pos, "%d", _cfg_selected);
+    if (n > 0 && (pos + n) < BUF_SIZE) pos += n;
+
+    // Terminatore stringa
+    buffer[pos++] = '\0';
+
+    // Scrivi in EEPROM
+    size_t addr = 0;
+    for (size_t i = 0; i < pos && addr < EEPROM.length(); i++)
+    {
+        EEPROM.update(addr++, buffer[i]);
+    }
+    EEPROM.commit();
+
+    Serial.println(F("Configuration saved!"));
 }
 
 void ButtonsConfiguration::_load_data()
 {
-  String matrixData = "";
-  int addr = 0;
-  bool readingSelected = false;
-  int selected = 0;
-  String selStr = "";
+    constexpr size_t BUF_SIZE = 512;
+    char buffer[BUF_SIZE];
 
-  while (true) 
-  {
-    char ch = EEPROM.read(addr++);
-    if (ch == '\0' || ch == (char)0xFF) 
+    // Leggi EEPROM in buffer
+    size_t addr = 0;
+    size_t pos = 0;
+    while (addr < EEPROM.length() && pos < BUF_SIZE - 1)
     {
-        if (readingSelected) 
-        {
-          selected = selStr.toInt();
+        char ch = EEPROM.read(addr++);
+        if (ch == '\0' || ch == (char)0xFF) break;
+        buffer[pos++] = ch;
+    }
+    buffer[pos] = '\0';
+
+    // Trova separatore config/selected
+    char* hash = strchr(buffer, '#');
+    if (!hash)
+    {
+        Serial.println(F("No saved configuration found."));
+        return;
+    }
+
+    *hash = '\0'; // separa le due parti
+    int selected = atoi(hash + 1);
+
+    Serial.print(F("Read Matrixdata:\n"));
+    Serial.println(buffer);
+    Serial.print(F("Selected: "));
+    Serial.println(selected);
+
+    // Parsing riga per riga manuale
+    char* lineStart = buffer;
+    while (lineStart && *lineStart)
+    {
+        char* lineEnd = strchr(lineStart, '\n');
+        if (lineEnd) *lineEnd = '\0';
+
+        // Ogni riga: ConfigName:btnName-key,btnName-key,...
+        char* colon = strchr(lineStart, ':');
+        if (!colon) {
+            lineStart = lineEnd ? lineEnd + 1 : nullptr;
+            continue;
         }
-        break;
+
+        *colon = '\0';
+        const char* cfgName = lineStart;
+        const char* rest = colon + 1;
+
+        function_t functions[MAX_BTN_NUMBER];
+        for (int i = 0; i < MAX_BTN_NUMBER; i++) functions[i] = {"", ""};
+        int cellIndex = 0;
+
+        const char* tokenStart = rest;
+        while (tokenStart && *tokenStart && cellIndex < MAX_BTN_NUMBER)
+        {
+            const char* comma = strchr(tokenStart, ',');
+            size_t len = comma ? (size_t)(comma - tokenStart) : strlen(tokenStart);
+            char tmp[64];
+            strncpy(tmp, tokenStart, len);
+            tmp[len] = '\0';
+
+            char* dash = strchr(tmp, '-');
+            if (dash) {
+                *dash = '\0';
+                functions[cellIndex].name = tmp;
+                functions[cellIndex].key  = dash + 1;
+            } else {
+                functions[cellIndex].name = "";
+                functions[cellIndex].key  = tmp;
+            }
+
+            cellIndex++;
+            tokenStart = comma ? comma + 1 : nullptr;
+        }
+
+        if (!this->_add_configuration(functions, cfgName))
+        {
+            Serial.println(F("Add configuration FAILED!"));
+        }
+
+        lineStart = lineEnd ? lineEnd + 1 : nullptr;
     }
 
-    if (readingSelected) 
-    {
-        selStr += ch;
-        continue;
-    }
-
-    if (ch == '#') 
-    {
-        readingSelected = true;
-        continue;
-    }
-
-    matrixData += ch;
-  }
-
-  Serial.println("Read Matrixdata: " + String(matrixData));
-  Serial.println("Selected: " + String(selected));
-
-  String function[MAX_BTN_NUMBER];   // array per le celle della riga
-  int cellIndex = 0;    // indice cella corrente
-  String cell = "";
-  String function_name = "--";
-
-  for (int pos = 0; pos < matrixData.length(); pos++) 
-  {
-      char ch = matrixData[pos];
-      if (ch == ':')
-      {
-          function_name = cell;
-          cell = "";
-      }
-      else if (ch == ',' || ch == '\n') 
-      {
-          // Salva la cella in function, se c'è spazio
-          if (cellIndex < MAX_BTN_NUMBER)
-          {
-              function[cellIndex++] = cell;
-          }
-
-          cell = "";
-
-          if (ch == '\n') 
-          {
-              // Fine riga → stampa function
-              //Serial.print("Riga: ");
-              // for (int i = 0; i < cellIndex; i++) {
-              //     //Serial.print("[");
-              //     //Serial.print(function[i]);
-              //     //Serial.print("]");
-              //     if (i < cellIndex - 1) {
-              //       //Serial.print(", ");
-              //     }
-              // }
-              //Serial.println();
-
-              if(!this->_add_configuration(function, function_name))
-              {
-                Serial.println(F("Add configuration FAILED!"));
-              }
-
-              // Reset per la nuova riga
-              cellIndex = 0;
-              for (int i = 0; i < MAX_BTN_NUMBER; i++) function[i] = "";
-          }
-      } 
-      else 
-      {
-          cell += ch;  // accumulo carattere
-      }
-  }
-
-  Serial.print(F("Selected: "));
-  Serial.println(String(selected));
-  this->_select_configuration(selected);
+    this->_select_configuration(selected);
 }
+
 
 bool ButtonsConfiguration::_add_configuration(const function_t function_list[MAX_BTN_NUMBER], 
                                               const String& name)
@@ -325,7 +345,7 @@ bool ButtonsConfiguration::_add_configuration(const function_t function_list[MAX
   for (int i = 0; i < MAX_BTN_NUMBER; i++) 
   {
     const FunctionButton::Number number = FunctionButton::get_number(i);
-    arr->buttons[i] = new FunctionButton(number, function_list[i]);
+    arr->buttons[i] = new FunctionButton(number, function_list[i].key, function_list[i].name);
   }
   _config[_config_size++] = arr;
   Serial.print(F("Add configuration done, config size: "));

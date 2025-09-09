@@ -11,13 +11,16 @@ class Button
 {
 public:
   using pin_number_t = uint8_t;
+  using name_t = String;
+
   Button();
   Button(const Button& button);
-  Button(pin_number_t pin);
+  Button(pin_number_t pin, const name_t& name);
 
   void update();
 
   const pin_number_t pin() const;
+  const name_t& name() const;
   const bool is_valid() const;
 
 protected:
@@ -28,6 +31,7 @@ protected:
 private:
   void _press(bool state);
   pin_number_t _pin;
+  name_t _name;
   unsigned long _last_pressed_time;
   unsigned long _long_pressed_time;
   bool _long_pressed;

@@ -18,7 +18,7 @@ bool exec_cmd(const CommandResult &cmd_result)
 
     case CommandType::ADD_CFG:
     {
-      String functions[MAX_BTN_NUMBER];
+      function_t functions[MAX_BTN_NUMBER];
       String function_name = extract_function_name(cmd_result.payload);
       extract_functions(cmd_result.payload, functions);
       global_buttons_configuration.add_configuration(functions, function_name);

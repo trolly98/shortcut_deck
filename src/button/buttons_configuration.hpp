@@ -3,7 +3,10 @@
 #include "function_button.hpp"
 #include <EEPROM.h>
 
-using function_t = String;
+struct function_t{
+    String key;
+    String name;
+};
 
 class ButtonArray {
 public:

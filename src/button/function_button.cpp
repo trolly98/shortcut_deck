@@ -6,8 +6,9 @@
 KeyboardKeyConverter* FunctionButton::_keyboard_converter = new ArduinoKeyboardKeyConverter();
 
 FunctionButton::FunctionButton(Number number, 
-                               const String &key) : 
-    Button(FunctionButton::_get_attached_pin(number)),
+                               const String &key,
+                               const String &name) : 
+    Button(FunctionButton::_get_attached_pin(number), name),
     _key(key),
     _number{number},
     _special_key_count{0},
@@ -28,7 +29,7 @@ FunctionButton::FunctionButton(Number number,
 }
 
 FunctionButton::FunctionButton() : 
-    FunctionButton(Number::UNKNOWN, "") 
+    FunctionButton(Number::UNKNOWN, "", "") 
 {
 }
 
@@ -53,28 +54,6 @@ const FunctionButton::Number FunctionButton::number() const
 const String &FunctionButton::key() const
 {
     return _key;
-}
-
-const String FunctionButton::short_key() const
-{
-    String result = "";
-    int start = 0;
-    int plusPos = _key.indexOf('+', start);
-
-    while (plusPos != -1) {
-        String piece = _key.substring(start, plusPos);
-        if (piece.length() > 3) piece = piece.substring(0, 3);
-        result += piece + "+";
-        start = plusPos + 1;
-        plusPos = _key.indexOf('+', start);
-    }
-
-    // Gestione dell'ultimo pezzo
-    String lastPiece = _key.substring(start);
-    if (lastPiece.length() > 3) lastPiece = lastPiece.substring(0, 3);
-    result += lastPiece;
-
-    return result;
 }
 
 FunctionButton::Number FunctionButton::get_number(unsigned int value)

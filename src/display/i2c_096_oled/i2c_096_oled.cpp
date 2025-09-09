@@ -215,7 +215,7 @@ void I2C096Oled::print_configuration(const ButtonArray* config,
             int idx = row * cellCols + col;
             if (idx >= MAX_BTN_NUMBER) break;
 
-            String val = config->buttons[idx]->key();
+            String val = config->buttons[idx]->name();
             if (val == "") val = "-";
 
             // suddividiamo il testo in massimo 3 righe da 5 caratteri ciascuna

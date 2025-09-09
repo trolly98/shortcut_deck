@@ -120,28 +120,59 @@
 
   .grid-btn {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    width:110px;
-    height:110px;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width:120px;
+    height:120px;
     font-size:1.1em;
     border:1px solid #0ff;
-    padding:5px;
     background:#111;
     color:#0ff;
     border-radius:6px;
-    cursor:text;
     transition: 0.2s;
+    position: relative;
+    overflow: hidden;
   }
   .grid-btn:hover {
-    color: #ff00ff;
     border-color: #ff00ff;
     box-shadow: 0 0 8px #ff00ff, 0 0 16px #00ffff;
     background: linear-gradient(135deg, #111, #222);
     transform: scale(1.05);
     transition: all 0.2s ease-in-out;
   }
-  .grid-btn:focus { outline:2px solid #ff0; background:#222; }
+
+  .grid-btn-label {
+    font-size: 0.9em;
+    color: #ff00ff;
+    text-align: center;
+    padding: 3px;
+    min-height: 20px;
+  }
+  .grid-btn-label[contenteditable="true"]:focus {
+    outline:2px solid #ff0;
+    background:#222;
+  }
+
+  .grid-btn-separator {
+    height:1px;
+    background: linear-gradient(90deg, transparent, #0ff, transparent);
+    margin: 2px 0;
+    box-shadow: 0 0 6px #0ff;
+  }
+
+  .grid-btn-content {
+    flex: 1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:4px;
+  }
+  .grid-btn-content[contenteditable="true"]:focus {
+    outline:2px solid #ff0;
+    background:#222;
+  }
 
   #btn-rm-all {
     width:140px;
@@ -218,13 +249,32 @@ let bufferShowIndexes = "";
 
 const grid = document.getElementById("grid");
 const btnInputs = [];
+const labelInputs = [];
+
 for (let i = 0; i < 9; i++) {
-  const btn = document.createElement("div");
-  btn.className = "grid-btn";
-  btn.contentEditable = true;
-  btn.textContent = "";
-  grid.appendChild(btn);
-  btnInputs.push(btn);
+  const wrapper = document.createElement("div");
+  wrapper.className = "grid-btn";
+
+  const labelDiv = document.createElement("div");
+  labelDiv.className = "grid-btn-label";
+  labelDiv.contentEditable = true;
+  labelDiv.textContent = "";
+  wrapper.appendChild(labelDiv);
+
+  const separator = document.createElement("div");
+  separator.className = "grid-btn-separator";
+  wrapper.appendChild(separator);
+
+  const contentDiv = document.createElement("div");
+  contentDiv.className = "grid-btn-content";
+  contentDiv.contentEditable = true;
+  contentDiv.textContent = "";
+  wrapper.appendChild(contentDiv);
+
+  grid.appendChild(wrapper);
+
+  labelInputs.push(labelDiv);
+  btnInputs.push(contentDiv);
 }
 
 function isConnected() { return port && writer; }
@@ -250,6 +300,7 @@ connectBtn.onclick = async () => {
     connectBtn.classList.remove("green");
     document.getElementById("cfg-name").value = "";
     btnInputs.forEach(b => b.textContent = "");
+    labelInputs.forEach(l => l.textContent = "");
     document.getElementById("rm-select").innerHTML = "";
     document.getElementById("switch-select").innerHTML = "";
   }
@@ -265,8 +316,6 @@ async function readLoop() {
 }
 
 function handleSerialText(text) {
-  const statusDiv = document.getElementById("status-msg");
-
   if(bufferShowActualCfg !== null) {
     bufferShowActualCfg += text;
     if(bufferShowActualCfg.includes("---------------------------")) {
@@ -312,16 +361,22 @@ document.getElementById("btn-show-actual").onclick = () => { if(isConnected()) u
 document.getElementById("btn-clear").onclick = () => {
   document.getElementById("cfg-name").value="";
   btnInputs.forEach(b=>b.textContent="");
+  labelInputs.forEach(l=>l.textContent="");
 };
 document.getElementById("btn-add-cfg").onclick = async () => {
   if(!isConnected()) return;
   const name = document.getElementById("cfg-name").value.trim();
   const obj = { name };
   let hasData = name!=="";
+
   btnInputs.forEach((b,i)=>{
-    obj["btn_"+(i+1)] = b.textContent.trim();
-    if(b.textContent.trim()!=="") hasData=true;
+    const content = b.textContent.trim();
+    const label = labelInputs[i].textContent.trim();
+    obj["btn_"+(i+1)] = content;
+    obj["label_"+(i+1)] = label;
+    if(content!=="" || label!=="") hasData = true;
   });
+
   if(!hasData){ alert("No data to send!"); return; }
   await sendCommand("ADD_CFG="+JSON.stringify(obj));
   await updateAll();
@@ -337,6 +392,7 @@ function parseShowActualCfg(text){
   if(indexMatch && parseInt(indexMatch[1]) === -1){
     statusDiv.textContent = "No config";
     btnInputs.forEach(b => b.textContent="");
+    labelInputs.forEach(l => l.textContent="");
     document.getElementById("cfg-name").value = "";
     return;
   } else {
@@ -346,15 +402,31 @@ function parseShowActualCfg(text){
   const nameMatch = text.match(/Name:\s*(.+)/);
   if(nameMatch) document.getElementById("cfg-name").value = nameMatch[1].trim();
 
+  // Reset
+  btnInputs.forEach(b => b.textContent="");
+  labelInputs.forEach(l => l.textContent="");
+
+  // Bottoni
   const btnMatches = [...text.matchAll(/BTN_(\d)\((.*?)\)/g)];
   btnMatches.forEach(m=>{
     const idx = parseInt(m[1])-1;
-    btnInputs[idx].textContent = m[2];
+    const fullText = m[2];
+    const colonPos = fullText.indexOf(':');
+    if(colonPos >= 0){
+      // label prima dei due punti, comando dopo
+      labelInputs[idx].textContent = fullText.slice(0, colonPos).trim();
+      btnInputs[idx].textContent = fullText.slice(colonPos+1).trim();
+    } else {
+      // nessun colon → tutto comando
+      labelInputs[idx].textContent = "";
+      btnInputs[idx].textContent = fullText.trim();
+    }
   });
 }
 
 // Inizializza griglia vuota
 btnInputs.forEach(b => b.textContent = "");
+labelInputs.forEach(l => l.textContent = "");
 </script>
 </body>
 </html>

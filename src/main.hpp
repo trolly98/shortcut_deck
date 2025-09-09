@@ -13,7 +13,7 @@ bool show_info = false;
 class SwitchCfgButton : public Button
 {
 public:
-  SwitchCfgButton() : Button(SWITCH_CFG_BTN_PIN) {}
+  SwitchCfgButton() : Button(SWITCH_CFG_BTN_PIN, "") {}
 
 protected:
   void pressed() override{}

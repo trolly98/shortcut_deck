@@ -65,28 +65,42 @@ String extract_function_name(const String &json_data)
   return "--";
 }
 
-void extract_functions(const String &json_data, String functions[MAX_BTN_NUMBER]) 
+void extract_functions(const String &json_data, function_t functions[MAX_BTN_NUMBER]) 
 {
-    for (int i = 0; i < MAX_BTN_NUMBER; i++) 
+  for (int i = 0; i < MAX_BTN_NUMBER; i++) 
+  {
+    functions[i] = {"", ""};
+
+    String key = "\"btn_" + String(i + 1) + "\":\"";
+    int start = json_data.indexOf(key);
+    if (start != -1) 
     {
-        String key = "\"btn_" + String(i + 1) + "\":\"";
-        int start = json_data.indexOf(key);
-        if (start != -1) 
+        start += key.length();
+        int end = json_data.indexOf("\"", start);
+        if (end != -1) 
         {
-            start += key.length();
-            int end = json_data.indexOf("\"", start);
-            if (end != -1) 
-            {
-                functions[i] = json_data.substring(start, end);
-            } 
-            else 
-            {
-                functions[i] = "";
-            }
+            functions[i].key = json_data.substring(start, end);
         } 
         else 
         {
-            functions[i] = "";
+            functions[i].key = "";
         }
     }
+
+    key = "\"label_" + String(i + 1) + "\":\"";
+    start = json_data.indexOf(key);
+    if (start != -1) 
+    {
+        start += key.length();
+        int end = json_data.indexOf("\"", start);
+        if (end != -1) 
+        {
+            functions[i].name = json_data.substring(start, end);
+        } 
+        else 
+        {
+            functions[i].name = "";
+        }
+    }
+  }
 }

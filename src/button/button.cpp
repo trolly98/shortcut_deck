@@ -1,7 +1,8 @@
 #include "button.hpp"
 
-Button::Button(pin_number_t pin) : 
+Button::Button(pin_number_t pin, const name_t& name) : 
   _pin(pin),
+  _name(name),
   _last_pressed_time{0},
   _pressed{false},
   _long_pressed_time{0},
@@ -16,9 +17,9 @@ Button::Button(pin_number_t pin) :
   pinMode(this->pin(), INPUT_PULLUP);
 }
 
-Button::Button() : Button(0) {}
+Button::Button() : Button(0, "") {}
 
-Button::Button(const Button& button) : Button(button._pin) {}
+Button::Button(const Button& button) : Button(button._pin, button._name) {}
 
 
 void Button::_press(bool state)
@@ -81,6 +82,11 @@ void Button::update()
 const Button::pin_number_t Button::pin() const
 {
   return _pin;
+}
+
+const Button::name_t& Button::name() const
+{
+  return _name;
 }
 
 const bool Button::is_valid() const
