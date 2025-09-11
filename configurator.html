@@ -174,6 +174,10 @@
     background:#222;
   }
 
+  #btn-add-cfg {
+    margin-top: 55px;
+  }
+
   #btn-rm-all {
     width:140px;
     height:48px;
@@ -184,7 +188,6 @@
     color:#ff7777;
     cursor:pointer;
     text-transform: uppercase;
-    margin-top:5px;
     transition: 0.2s;
   }
   #btn-rm-all:hover {
@@ -215,7 +218,6 @@
   <div id="controls-left">
     <div id="status-msg"></div>
     <button class="small-btn" id="btn-show-actual">Refresh</button>
-    <button class="small-btn" id="btn-add-cfg">Add Config</button>
     <button class="small-btn" id="btn-clear">Clear</button>
   </div>
 
@@ -227,6 +229,7 @@
 
   <!-- Colonna destra -->
   <div id="controls-right">
+    <button class="small-btn" id="btn-add-cfg">Add Config</button>
     <div class="row">
       <button id="btn-rm-cfg" class="small-btn">Remove</button>
       <select id="rm-select" class="small-btn"></select>
