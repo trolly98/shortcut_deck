@@ -17,6 +17,7 @@ public:
     //Serial.println(F("ButtonArray destroyed")); 
   };
   const String& name() const { return _name; }
+  void set_name(const String& name) { _name = name; }
 private:
   String _name = "--";
 };
@@ -31,7 +32,10 @@ public:
   bool configuration_available();
 
   bool add_configuration(const function_t function_list[MAX_BTN_NUMBER], 
-                         const String& name);
+                        const String& name);
+  bool update_configuration(index_t index,
+                            const function_t function_list[MAX_BTN_NUMBER], 
+                            const String& name);
   bool remove_configuration(index_t index);
   bool remove_all_configurations();
   bool select_configuration(index_t index);

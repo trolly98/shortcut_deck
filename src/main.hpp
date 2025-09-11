@@ -7,7 +7,6 @@
 
 #define SWITCH_CFG_BTN_PIN 10
 
-volatile int old_current_config = -2;
 bool show_info = false;
 
 class SwitchCfgButton : public Button
@@ -73,9 +72,8 @@ void main_loop()
     }
   }
 
-  if (old_current_config != global_buttons_configuration.current_index())
+  if (is_display_need_to_be_updated())
   {
-    old_current_config = global_buttons_configuration.current_index();
     update_display();
   }
 

@@ -37,6 +37,45 @@ bool ButtonsConfiguration::add_configuration(const function_t function_list[MAX_
   return true;
 }
 
+bool ButtonsConfiguration::update_configuration(index_t index,
+                                               const function_t function_list[MAX_BTN_NUMBER], 
+                                               const String& name)
+{
+  if (index < 0 || index >= _config_size)
+  {
+    Serial.print(F("Configuration index: "));
+    Serial.print(index);
+    Serial.println(F(" out of range!"));
+    return false;
+  }
+
+  ButtonArray* btn_array = _config[index];
+  if (!btn_array)
+  {
+    Serial.print(F("Configuration at index: "));
+    Serial.print(index);
+    Serial.println(F(" is null!"));
+    return false;
+  }
+
+  btn_array->set_name(name);
+  for (int i = 0; i < MAX_BTN_NUMBER; i++)
+  {
+    if (function_list[i].key != "")
+    {
+      btn_array->buttons[i]->set_key(function_list[i].key);
+    }
+    if (function_list[i].name != "")
+    {
+      btn_array->buttons[i]->set_name(function_list[i].name);
+    }
+  }
+
+  this->_select_configuration(index);
+  this->_save_data();
+  return true;
+}
+
 bool ButtonsConfiguration::remove_configuration(index_t index)
 {
   if(!this->_remove_configuration(index))

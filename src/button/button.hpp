@@ -18,6 +18,7 @@ public:
   Button(pin_number_t pin, const name_t& name);
 
   void update();
+  void set_name(const name_t& name);
 
   const pin_number_t pin() const;
   const name_t& name() const;

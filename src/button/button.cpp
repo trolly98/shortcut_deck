@@ -79,6 +79,11 @@ void Button::update()
   this->_press(!digitalRead(_pin));
 }
 
+void Button::set_name(const name_t& name)
+{
+  _name = name;
+}
+
 const Button::pin_number_t Button::pin() const
 {
   return _pin;

@@ -30,6 +30,8 @@ public:
   FunctionButton();
   ~FunctionButton();
 
+  void set_key(const String &key);
+
   const Number number() const;
   const String &key() const;
 

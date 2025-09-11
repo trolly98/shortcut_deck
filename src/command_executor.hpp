@@ -25,6 +25,23 @@ bool exec_cmd(const CommandResult &cmd_result)
       return true;
     }
 
+    case CommandType::UPDATE_CFG:
+    {
+      function_t functions[MAX_BTN_NUMBER];
+      int configuration_index = extract_function_index(cmd_result.payload);
+      if (configuration_index < 0)
+      {
+        Serial.println(F("Invalid configuration index: -1!"));
+        return false;
+      }
+      String function_name = extract_function_name(cmd_result.payload);
+      extract_functions(cmd_result.payload, functions);
+      global_buttons_configuration.update_configuration(configuration_index, functions, function_name);
+
+      update_display();
+      return true;
+    }
+
     case CommandType::RM_CFG:
     {
       const ButtonsConfiguration::index_t index 

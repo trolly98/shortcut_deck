@@ -23,9 +23,7 @@ FunctionButton::FunctionButton(Number number,
     {
         //Serial.println("Button with pin: " + String(this->pin()) + " - and key: " + key + " created");
     }
-    _special_key_count = _key_parser.parse_keys(_key, _special_key, MAX_SPECIAL_KEYS);
-    //Serial.println("Special keys parsed for button: " + this->key());
-    //Serial.println("Number of special keys: " + String(_special_key_count));
+    this->set_key(_key);
 }
 
 FunctionButton::FunctionButton() : 
@@ -44,6 +42,20 @@ FunctionButton::~FunctionButton()
             _special_key[i] = nullptr;
         }
     }
+}
+
+void FunctionButton::set_key(const String &key)
+{
+    _key = key;
+    for (int i = 0; i < _special_key_count; i++)
+    {
+        if (_special_key[i] != nullptr)
+        {
+            delete _special_key[i];
+            _special_key[i] = nullptr;
+        }
+    }
+    _special_key_count = _key_parser.parse_keys(_key, _special_key, MAX_SPECIAL_KEYS);
 }
 
 const FunctionButton::Number FunctionButton::number() const

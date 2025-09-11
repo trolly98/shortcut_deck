@@ -7,6 +7,7 @@ enum class CommandType
   UNKNOWN,
   SWITCH_CFG,
   ADD_CFG,
+  UPDATE_CFG,
   RM_CFG,
   RM_ALL_CFG,
   SHOW_CFG,
@@ -25,6 +26,7 @@ CommandType recognize_command(const String &cmdStr)
 {
   if (cmdStr == "SWITCH_CFG") return CommandType::SWITCH_CFG;
   if (cmdStr == "ADD_CFG")    return CommandType::ADD_CFG;
+  if (cmdStr == "UPDATE_CFG") return CommandType::UPDATE_CFG;
   if (cmdStr == "RM_CFG")     return CommandType::RM_CFG;
   if (cmdStr == "RM_ALL_CFG")     return CommandType::RM_ALL_CFG;
   if (cmdStr == "SHOW_CFG")   return CommandType::SHOW_CFG;
@@ -47,6 +49,20 @@ CommandResult parse_serial_line(const String &line)
   //Serial.println("Command recognizion: " + cmdStr);
   CommandType cmd = recognize_command(cmdStr);
   return {recognize_command(cmdStr), payload};
+}
+
+int extract_function_index(const String &json_data)
+{
+  String key = "\"index\":";
+  int index_start = json_data.indexOf(key);
+  if (index_start != -1) 
+  {
+    index_start += key.length();
+    int index_end = json_data.indexOf(",", index_start);
+    if (index_end == -1) index_end = json_data.length();
+    return json_data.substring(index_start, index_end).toInt();
+  }
+  return -1;
 }
 
 String extract_function_name(const String &json_data)

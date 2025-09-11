@@ -214,7 +214,7 @@
   <!-- Colonna sinistra -->
   <div id="controls-left">
     <div id="status-msg"></div>
-    <button class="small-btn" id="btn-show-actual">Update</button>
+    <button class="small-btn" id="btn-show-actual">Refresh</button>
     <button class="small-btn" id="btn-add-cfg">Add Config</button>
     <button class="small-btn" id="btn-clear">Clear</button>
   </div>
@@ -234,6 +234,10 @@
     <div class="row">
       <button id="btn-switch-cfg" class="small-btn">Switch</button>
       <select id="switch-select" class="small-btn"></select>
+    </div>
+    <div class="row">
+      <button id="btn-update-cfg" class="small-btn">Update</button>
+      <select id="update-select" class="small-btn"></select>
     </div>
     <button id="btn-rm-all">Remove All</button>
   </div>
@@ -303,6 +307,7 @@ connectBtn.onclick = async () => {
     labelInputs.forEach(l => l.textContent = "");
     document.getElementById("rm-select").innerHTML = "";
     document.getElementById("switch-select").innerHTML = "";
+    document.getElementById("update-select").innerHTML = "";
   }
 };
 
@@ -332,11 +337,14 @@ function handleSerialText(text) {
         const n = parseInt(match[1]);
         const rmSel = document.getElementById("rm-select");
         const swSel = document.getElementById("switch-select");
+        const upSel = document.getElementById("update-select");
         rmSel.innerHTML = "";
         swSel.innerHTML = "";
+        upSel.innerHTML = "";
         for(let i=1;i<=n;i++){
           let o1=document.createElement("option"); o1.value=i; o1.textContent=i; rmSel.appendChild(o1);
           let o2=document.createElement("option"); o2.value=i; o2.textContent=i; swSel.appendChild(o2);
+          let o3=document.createElement("option"); o3.value=i; o3.textContent=i; upSel.appendChild(o3);
         }
         bufferShowIndexes = "";
       }
@@ -346,6 +354,7 @@ function handleSerialText(text) {
 
 async function sendCommand(cmd) {
   if (!writer) { alert("Not connected!"); return; }
+  console.log("Sending command:", cmd);
   await writer.write(encoder.encode(cmd + "\n"));
 }
 
@@ -383,6 +392,28 @@ document.getElementById("btn-add-cfg").onclick = async () => {
 };
 document.getElementById("btn-rm-cfg").onclick = async () => { if(isConnected()) { const idx = document.getElementById("rm-select").value; if(idx) { await sendCommand("RM_CFG="+idx); await updateAll(); } } };
 document.getElementById("btn-switch-cfg").onclick = async () => { if(isConnected()) { const idx = document.getElementById("switch-select").value; if(idx) { await sendCommand("SWITCH_CFG="+idx); await updateAll(); } } };
+document.getElementById("btn-update-cfg").onclick = async () => {
+  if(!isConnected()) return;
+  const idx = document.getElementById("update-select").value;
+  if(!idx) return;
+
+  const name = document.getElementById("cfg-name").value.trim();
+  const obj = { name };
+  let hasData = name !== "";
+
+  btnInputs.forEach((b,i)=>{
+    const content = b.textContent.trim();
+    const label = labelInputs[i].textContent.trim();
+    obj["btn_"+(i+1)] = content;
+    obj["label_"+(i+1)] = label;
+    if(content!=="" || label!=="") hasData = true;
+  });
+
+  if(!hasData){ alert("No data to send!"); return; }
+  obj["index"] = idx;
+  await sendCommand("UPDATE_CFG="+JSON.stringify(obj));
+  await updateAll();
+};
 document.getElementById("btn-rm-all").onclick = async () => { if(isConnected()) { if(confirm("Are you sure? This will remove all configurations!")) { await sendCommand("RM_ALL_CFG"); await updateAll(); } } };
 
 // Parser SHOW_ACTUAL_CFG
@@ -413,11 +444,9 @@ function parseShowActualCfg(text){
     const fullText = m[2];
     const colonPos = fullText.indexOf(':');
     if(colonPos >= 0){
-      // label prima dei due punti, comando dopo
       labelInputs[idx].textContent = fullText.slice(0, colonPos).trim();
       btnInputs[idx].textContent = fullText.slice(colonPos+1).trim();
     } else {
-      // nessun colon → tutto comando
       labelInputs[idx].textContent = "";
       btnInputs[idx].textContent = fullText.trim();
     }
