@@ -59,8 +59,18 @@ int extract_function_index(const String &json_data)
   {
     index_start += key.length();
     int index_end = json_data.indexOf(",", index_start);
-    if (index_end == -1) index_end = json_data.length();
-    return json_data.substring(index_start, index_end).toInt();
+    if (index_end == -1) 
+    {
+      index_end = json_data.indexOf("}", index_start);
+    }
+    if (index_end == -1) 
+    {
+      return -1;
+    }
+    String index_str = json_data.substring(index_start, index_end);
+    index_str.trim();
+    index_str.replace("\"", "");
+    return index_str.toInt();
   }
   return -1;
 }

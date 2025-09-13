@@ -48,7 +48,8 @@ bool ButtonsConfiguration::update_configuration(index_t index,
     Serial.println(F(" out of range!"));
     return false;
   }
-
+  Serial.print(F("Update configuration at index: "));
+  Serial.println(index);
   ButtonArray* btn_array = _config[index];
   if (!btn_array)
   {
