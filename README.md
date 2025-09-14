@@ -1,9 +1,6 @@
-Sure! Here’s your README in English with the serial commands section added:
-
-````markdown
 # Shortcut Deck
 
-Shortcut Deck is an Arduino project that manages programmable button configurations, simulating keyboard key presses via USB HID. It is designed to create a customizable keypad with configurable key combinations.
+Shortcut Deck is an Arduino SDK based project that manages programmable button configurations, simulating keyboard key presses via USB HID. It is designed to create a customizable keypad with configurable key combinations.
 
 ## Features
 
@@ -14,44 +11,32 @@ Shortcut Deck is an Arduino project that manages programmable button configurati
 
 ## Requirements
 
-- Arduino Micro or any USB HID compatible device
+- USB HID compatible device (I use this site to verify it: https://tttapa.github.io/Control-Surface/Doxygen/d8/d4a/md_pages_MIDI-over-USB.html)
 - Arduino libraries:
   - Keyboard
+- Optional: 0.96" OLED display
+
+## Tested Boards
+
+- [Waveshare RP2350-Plus Development Board](https://www.waveshare.com/product/rp2350-plus.htm)
 
 ## Usage
 
 1. Define button configurations in the code with desired key mappings.
-2. Upload the firmware to your Arduino Micro.
-3. Connect the Arduino to your PC via USB.
+2. Upload the firmware to your board.
+3. Connect the board to your PC via USB.
 4. The device will act as a HID keyboard, sending configured key presses when buttons are pressed.
 
-## Serial Commands
+## Configuration
 
-You can control the device by sending commands through the serial port (e.g., `/dev/ttyACM0`):
+Shortcut Deck can be configured using the included **`configurator.html`** tool:  
 
-- **Switch configuration:**
-  ```bash
-  echo "SWITCH_CFG=2" > /dev/ttyACM0
-````
+1. Connect the board to your PC.  
+2. Open `configurator.html` in your browser.  
+3. Fill in the fields with the desired shortcut configuration.  
+4. Click **ADD CONFIG** to send the configuration to the board.  
 
-* **Add configuration:**
-
-  ```bash
-  echo 'ADD_CFG={"btn_1":"c", "btn_2":"h"}' > /dev/ttyACM0
-  ```
-
-* **Remove configuration:**
-
-  ```bash
-  echo "RM_CFG=2" > /dev/ttyACM0
-  ```
-
-* **Show entire configuration:**
-
-  ```bash
-  echo "SHOW_CFG" > /dev/ttyACM0
-  ```
-
+The board will store the configuration and use it immediately for the programmed buttons.
 
 ## License
 
